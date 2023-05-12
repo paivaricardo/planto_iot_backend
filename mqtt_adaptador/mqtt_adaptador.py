@@ -1,5 +1,5 @@
 import paho.mqtt.client as mqtt
-
+from kafka import KafkaProducer
 
 class MQTTAdapter:
     _instance = None
@@ -8,20 +8,24 @@ class MQTTAdapter:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
 
-            # MQTT client instance
+            # Instância do cliente MQTT
             cls._instance.client = mqtt.Client()
 
-            # MQTT client callbacks
+            # Callbacks para o cliente MQTT
             cls._instance.client.on_connect = cls._instance.on_connect
             cls._instance.client.on_message = cls._instance.on_message
 
-            # Connect to the MQTT broker
+            # Conectar ao broker MQTT
             cls._instance.client.connect("18.214.223.254", 1883, 60)
 
-            # Subscribe to the desired topics
-            cls._instance.client.subscribe("planto-iot-sensores")
+            # Inscrever-se nos tópicos desejados
+            cls._instance.client.subscribe("planto-iot-sensores/+/+/S")
 
-            cls._instance.client.loop_forever()
+            # Create Kafka producer instance
+            cls._instance.producer = KafkaProducer(bootstrap_servers='18.214.223.254:9092')
+
+            # Inicia o cliente MQTT em loop
+            cls._instance.client.loop_start()
         return cls._instance
 
     def on_connect(self, client, userdata, flags, result_code):
@@ -30,8 +34,10 @@ class MQTTAdapter:
     def on_message(self, client, userdata, msg):
         print("Recebida mensagem via MQTT no tópico {" + msg.topic + "}: " + str(msg.payload))
 
-        # Process the received message
+        # Publicar a mensagem para um tópico do Apache Kafka - Relay de mensagens
+        self.producer.send('planto-iot-sensores-kafka', msg.payload)
 
+        print("Enviada a mensagem do broker Kafka")
 
 
     def publish(self, topic, payload):
@@ -42,3 +48,6 @@ class MQTTAdapter:
         # Disconnect from the MQTT broker
         self.client.loop_stop()
         self.client.disconnect()
+
+        # Close the Kafka producer
+        self.producer.close()
