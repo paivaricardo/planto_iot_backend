@@ -35,7 +35,7 @@ class MQTTAdapter:
         print("Recebida mensagem via MQTT no tópico {" + msg.topic + "}: " + str(msg.payload))
 
         # Publicar a mensagem para um tópico do Apache Kafka - Relay de mensagens
-        self.producer.send('planto-iot-sensores-kafka', msg.payload)
+        self.producer.send('planto-iot-sensores-kafka', str(msg.payload).encode('utf-8'))
 
         print("Enviada a mensagem do broker Kafka")
 

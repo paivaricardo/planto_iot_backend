@@ -4,7 +4,7 @@ from kafka.errors import KafkaError
 
 def processar_mensagem(message):
     # Process the message here
-    print("Recebida a mensagem do broker kafka:", message)
+    print("Recebida a mensagem do broker Kafka: ", message)
 
 
 def processamento_mensagens_kafka_consumer_thread():
