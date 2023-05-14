@@ -20,3 +20,7 @@ if __name__ == '__main__':
     # Start the MQTT Adapter thread
     # mqtt_adapter_thread.start()
 
+    # Terminar as threads conjuntamente
+    # mqtt_adapter_thread.join()
+    processamento_mensagens_thread.join()
+
