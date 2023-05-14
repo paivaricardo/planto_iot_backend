@@ -1,9 +1,18 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os
+
 
 def create_session():
-    connection_string = "postgresql://planto_iot_user:planto-iot-mariath@18.214.223.254:5432/db_planto_iot_sensores"
+    host = os.environ.get('DB_HOST')
+    port = os.environ.get('DB_PORT')
+    dbname = os.environ.get('DB_NAME')
+    user = os.environ.get('DB_USER')
+    password = os.environ.get('DB_PASSWORD')
+
+    connection_string = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
     engine = create_engine(connection_string)
     Session = sessionmaker(bind=engine)
     session = Session()
     return session
+
