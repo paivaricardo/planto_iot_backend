@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
 import json
 import re
 from mdl_validador_mensagens import validacao_mensagens
+from mdl_dao import dao_mensagens_sensores_atuadores
 
 def processar_mensagem(message, topic):
     #
@@ -12,6 +15,10 @@ def processar_mensagem(message, topic):
         print("[PROC MENSAGENS - INFO] Mensagem recebida:", message)
         json_raw_message = re.sub(r"^b'|'$", "", message)
         mensagem_dict = json.loads(json_raw_message)
+
+        # Converter a data-hora da mensagem para o formato datetime de Python
+        mensagem_dict["dataHoraAcionamentoLeitura"] = datetime.strptime(mensagem_dict["dataHoraAcionamentoLeitura"], "%a, %b %d, %Y %H:%M:%S")
+
         print("[PROC MENSAGENS - INFO] Mensagem decodificada em dicionário Python:", mensagem_dict)
 
         # Executar validações da mensagem
@@ -32,7 +39,12 @@ def processar_mensagem(message, topic):
 
         # Gravar a mensagem no banco de dados
         print("[PROC MENSAGENS - INFO] Iniciando gravação da mensagem no banco de dados.")
-        
+
+        # De acordo com o tipo de sinal, chamar diferentes funções do DAO para persistir na base de dados
+        if mensagem_dict["tipoSinal"] == 10000:
+            print("[PROC MENSAGENS - INFO] Redirecionando a mensagem para o módulo de persistência do DAO.")
+            dao_mensagens_sensores_atuadores.persistir_leitura_sensor_atuador(mensagem_dict)
+
 
     except Exception as e:
         print("[PROC MENSAGENS - ERRO] Erro no processamento da mensagem", e.args[0])

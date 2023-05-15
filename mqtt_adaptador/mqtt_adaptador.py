@@ -24,7 +24,7 @@ class MQTTAdapter:
             # Create Kafka producer instance
             cls._instance.producer = KafkaProducer(bootstrap_servers='18.214.223.254:9092')
 
-            # Inicia o cliente MQTT em loop
+            # Inicia o cliente MQTT em loop (nova Thread)
             cls._instance.client.loop_start()
         return cls._instance
 
