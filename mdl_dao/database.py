@@ -1,9 +1,14 @@
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
 
 
 def create_session():
+    # Carregar as variáveis de ambiente do arquivo .env
+    load_dotenv()
+
+    # Recuperar as variáveis de ambiente e salvá-las em variáveis, para acesso ao banco de dados
     host = os.environ.get('DB_HOST')
     port = os.environ.get('DB_PORT')
     dbname = os.environ.get('DB_NAME')
