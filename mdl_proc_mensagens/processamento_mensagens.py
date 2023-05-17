@@ -17,7 +17,7 @@ def processar_mensagem(message, topic):
         mensagem_dict = json.loads(json_raw_message)
 
         # Converter a data-hora da mensagem para o formato datetime de Python
-        mensagem_dict["dataHoraAcionamentoLeitura"] = datetime.strptime(mensagem_dict["dataHoraAcionamentoLeitura"], "%a, %b %d, %Y %H:%M:%S")
+        mensagem_dict["dataHoraAcionamentoLeitura"] = datetime.strptime(mensagem_dict["dataHoraAcionamentoLeitura"], "%Y-%m-%dT%H:%M:%S.%f%z")
 
         print("[PROC MENSAGENS - INFO] Mensagem decodificada em dicionário Python:", mensagem_dict)
 
