@@ -1,9 +1,15 @@
+import logging
 import threading
 
+import uvicorn
+
 from mdl_proc_mensagens.processamento_mensagens import processamento_mensagens_kafka_consumer_thread
+from mdl_rest_api.rest_api_core import app
 from mqtt_adaptador.mqtt_adaptador import MQTTAdapter
 
 if __name__ == '__main__':
+    # Definir nível de log
+    logging.basicConfig(level=logging.INFO)
 
     # Criar uma thread para o processamento de mensagens oriundas do broker Kafka
     processamento_mensagens_thread = threading.Thread(target=processamento_mensagens_kafka_consumer_thread)
@@ -20,7 +26,19 @@ if __name__ == '__main__':
     # Start the MQTT Adapter thread
     # mqtt_adapter_thread.start()
 
+    # Rodar a REST API implementada com a FastAPI em uma thread própria, com utilização da biblioteca uvicorn
+    def run_fastapi():
+        logging.info("Iniciando o servidor FastAPI...")
+        uvicorn.run(app, host="0.0.0.0", port=8000)
+
+    # Criar uma thread própria para a REST API em FastAPI e iniciar
+    fastapi_thread = threading.Thread(target=run_fastapi)
+    fastapi_thread.start()
+
+    logging.info("REST API com a FastAPI inicializada com sucesso!")
+
     # Terminar as threads conjuntamente
     # mqtt_adapter_thread.join()
     processamento_mensagens_thread.join()
+    fastapi_thread.join()
 
