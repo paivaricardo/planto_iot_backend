@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from kafka import KafkaConsumer
@@ -9,7 +10,7 @@ from mdl_dao import dao_mensagens_sensores_atuadores
 
 def processar_mensagem(message, topic):
     #
-    print("[PROC MENSAGENS - INFO] Iniciado o processamento da mensagem.")
+    logging.info("[PROC MENSAGENS - INFO] Iniciado o processamento da mensagem.")
     try:
         # Decodificar a mensagem em json para um dicionário Python:
         print("[PROC MENSAGENS - INFO] Mensagem recebida:", message)
@@ -19,10 +20,10 @@ def processar_mensagem(message, topic):
         # Converter a data-hora da mensagem para o formato datetime de Python
         mensagem_dict["dataHoraAcionamentoLeitura"] = datetime.strptime(mensagem_dict["dataHoraAcionamentoLeitura"], "%Y-%m-%dT%H:%M:%S.%f%z")
 
-        print("[PROC MENSAGENS - INFO] Mensagem decodificada em dicionário Python:", mensagem_dict)
+        logging.info("[PROC MENSAGENS - INFO] Mensagem decodificada em dicionário Python:", mensagem_dict)
 
         # Executar validações da mensagem
-        print("[PROC MENSAGENS - INFO] Iniciando validações da mensagem.")
+        logging.info("[PROC MENSAGENS - INFO] Iniciando validações da mensagem.")
         # Validação inicial de uuid do sensor
         if not validacao_mensagens.validar_uuid_sensor_atuador(mensagem_dict):
             raise Exception("Mensagem descartada devido a inconsistência de uuid do sensor.")
@@ -35,23 +36,26 @@ def processar_mensagem(message, topic):
         if not validacao_mensagens.validar_consistencia_dados_sensor(mensagem_dict):
             raise Exception("Mensagem descartada devido a inconsistência de dados do sensor.")
 
-        print("[PROC MENSAGENS - INFO] Mensagem validada.")
+        logging.info("[PROC MENSAGENS - INFO] Mensagem validada.")
 
         # Gravar a mensagem no banco de dados
-        print("[PROC MENSAGENS - INFO] Iniciando gravação da mensagem no banco de dados.")
+        logging.info("[PROC MENSAGENS - INFO] Iniciando gravação da mensagem no banco de dados.")
 
         # De acordo com o tipo de sinal, chamar diferentes funções do DAO para persistir na base de dados
         if mensagem_dict["tipoSinal"] == 10000:
-            print("[PROC MENSAGENS - INFO] Redirecionando a mensagem para o módulo de persistência do DAO.")
+            logging.info("[PROC MENSAGENS - INFO] Redirecionando a mensagem de LEITURA DE SENSORES para o módulo de persistência do DAO.")
             dao_mensagens_sensores_atuadores.persistir_leitura_sensor_atuador(mensagem_dict)
 
+        if mensagem_dict["tipoSinal"] == 50001:
+            logging.info("[PROC MENSAGENS - INFO] Redirecionando a mensagem de ACK DE ACIONAMENTO DE ATUADORES para o módulo de persistência do DAO.")
+            dao_mensagens_sensores_atuadores.persistir_ack_atuador(mensagem_dict)
 
     except Exception as e:
-        print("[PROC MENSAGENS - ERRO] Erro no processamento da mensagem", e.args[0])
+        logging.info("[PROC MENSAGENS - ERRO] Erro no processamento da mensagem", e.args[0])
         return
 
 def processamento_mensagens_kafka_consumer_thread():
-    print("[PROC MENSAGENS - INFO] Iniciado o módulo de processamento de mensagens do Planto-IoT Backend.")
+    logging.info("[PROC MENSAGENS - INFO] Iniciado o módulo de processamento de mensagens do Planto-IoT Backend.")
     topic = "planto-iot-sensores-kafka"
 
     # Instanciar um consumidor Kafka para receber mensagens oriundas do broker Kafka, após relay de mensagens do MQTT
@@ -66,6 +70,6 @@ def processamento_mensagens_kafka_consumer_thread():
             print("[PROC MENSAGENS - INFO] Recebida a mensagem do broker Kafka no tópico:", topic, "mensagem:", message.value.decode("utf-8"))
             processar_mensagem(message.value.decode("utf-8"), topic)
     except KafkaError as e:
-        print("[PROC MENSAGENS - ERRO] Kafka Error:", e)
+        logging.info("[PROC MENSAGENS - ERRO] Kafka Error:", e)
     finally:
         consumer.close()

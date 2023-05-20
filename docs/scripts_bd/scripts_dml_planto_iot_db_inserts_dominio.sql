@@ -7,7 +7,8 @@ INSERT INTO tb_perfil
     (nome_perfil)
 VALUES ('Free'),
        ('Basic'),
-       ('Premium');
+       ('Premium'),
+       ('Admin');
 
 
 -- ************************************** Tabela: tb_area
@@ -34,11 +35,15 @@ VALUES (10000, 'Sensor de umidade do solo'),
 -- ************************************** Tabela: tb_tipo_sinal
 INSERT INTO tb_tipo_sinal
     (id_tipo_sinal, nome_tipo_sinal)
-VALUES (02000, 'LEITURA'),
-       (03000, 'FALHA'),
-       (04000, 'LIGAR'),
-       (05000, 'DESLIGAR'),
-       (06000, 'ACIONAMENTO');
+VALUES (10000, 'LEITURA'),
+       (10001, 'LEITURA-ACK'),
+       (20000, 'FALHA'),
+       (30000, 'LIGAR'),
+       (40000, 'DESLIGAR'),
+       (50000, 'ACIONAMENTO'),
+       (50001, 'ACIONAMENTO-ACK'),
+       (60000, 'CONEXÃO'),
+       (60001, 'CONEXÃO-ACK');
 
 -- ************************************** Tabela: tb_perfil_autorizacao
 INSERT INTO tb_perfil_autorizacao
