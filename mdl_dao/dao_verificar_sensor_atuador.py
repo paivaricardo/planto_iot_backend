@@ -14,16 +14,19 @@ def verificar_existencia_sensor_atuador_base_dados(uuid_informado: str):
         # Buscar se há uma correspondência do UUID informado para um atuador na base de dados
         sensor_atuador = session.query(SensorAtuador).filter(SensorAtuador.uuid_sensor_atuador == uuid_informado).first()
 
-        sensor_atuador_cadastrado = bool(
-                                            sensor_atuador.nome_sensor and
-                                            sensor_atuador.latitude and
-                                            sensor_atuador.longitude and
-                                            sensor_atuador.data_cadastro_sensor and
-                                            sensor_atuador.id_usuario_cadastrante and
-                                            sensor_atuador.id_area and
-                                            sensor_atuador.id_cultura and
-                                            sensor_atuador.id_tipo_sensor
-                                    )
+        try:
+            sensor_atuador_cadastrado = bool(
+                                                sensor_atuador.nome_sensor and
+                                                sensor_atuador.latitude and
+                                                sensor_atuador.longitude and
+                                                sensor_atuador.data_cadastro_sensor and
+                                                sensor_atuador.id_usuario_cadastrante and
+                                                sensor_atuador.id_area and
+                                                sensor_atuador.id_cultura and
+                                                sensor_atuador.id_tipo_sensor
+                                        )
+        except Exception as e:
+            sensor_atuador_cadastrado = False
 
         if not sensor_atuador:
             logging.info(f"[DAO - INFO] Sensor ou atuador com o UUID {uuid_informado} não encontrado no banco de dados.")
