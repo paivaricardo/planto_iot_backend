@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 from model.perfil_autorizacao_model import PerfilAutorizacao
 from model.sensor_atuador_model import SensorAtuador
@@ -15,3 +16,7 @@ class AutorizacaoSensor(Base):
     id_usuario = Column(Integer, ForeignKey(Usuario.id_usuario), nullable=False)
     id_perfil_autorizacao = Column(Integer, ForeignKey(PerfilAutorizacao.id_perfil_autorizacao), nullable=False)
     visualizacao_ativa = Column(Boolean, nullable=False, default=False)
+
+    # Relationships
+    usuario = relationship(Usuario)
+    perfil_autorizacao = relationship(PerfilAutorizacao)

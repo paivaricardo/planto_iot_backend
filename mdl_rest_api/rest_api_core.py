@@ -3,7 +3,8 @@ from uuid import UUID
 from fastapi import FastAPI, HTTPException
 
 from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_atuador_servicos, \
-    ativar_atuador_servicos
+    ativar_atuador_servicos, cadastrar_sensor_atuador_servicos
+from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
 
 app = FastAPI()
 
@@ -17,7 +18,7 @@ def health_check():
 
 
 @app.get("/pre-cadastrar-sensor-atuador")
-def cadastrar_sensor_ou_atuador(id_tipo_sensor: int):
+def precadastrar_sensor_ou_atuador(id_tipo_sensor: int):
     """
     Precadastra um sensor ou um atuador na base de dados.
 
@@ -37,7 +38,7 @@ def cadastrar_sensor_ou_atuador(id_tipo_sensor: int):
 @app.get("/ativar-atuador/{uuid}")
 def ativar_atuador(uuid: UUID, quantidade_atuacao: int):
     """
-    Envia um sinal para acionamento de um atuador específico no Planto IoT.
+    Envia sinal para ativação de um atuador específico no Planto IoT. O sinal é direcionado ao atuador com o uuid informado. A intensidade de ativação de um atuador é definida por meio de um queryParam de quantidade_atuacao.
     """
     try:
         if not uuid:
@@ -96,28 +97,29 @@ def verificar_sensor_atuador(uuid: UUID):
                             detail={"message": "Erro ao verificar se o sensor ou atuador existe na base de dados",
                                     "error": str(e)})
 
-# TODO: Implementar o cadastro de um sensor ou atuador na base de dados do Planto IoT usando o método POST com o parse do request body usando o Pydantic.
-app.post("/cadastrar-sensor-atuador/{uuid}")
-def cadastrar_sensor_atuador(uuid: UUID):
+
+@app.post("/cadastrar-sensor-atuador")
+def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCadastroCompleto):
     """
     Cadastra um sensor ou um atuador na base de dados do Planto IoT, completando os dados da tabela de sensores ou atuadores (tb_sensor_atuador).
 
     """
+
     try:
-        if not uuid:
+        if not sensor_atuador_cadastro_completo.uuid_sensor_atuador:
             raise Exception("UUID não informado")
 
         # Chamar camada de serviços para verificar se o sensor ou atuador realmente existe na base de dados
-        sensor_atuador_status = verificar_sensor_atuador_servicos.verificar_existencia_sensor_atuador_servico(str(uuid))
+        sensor_atuador_status = verificar_sensor_atuador_servicos.verificar_existencia_sensor_atuador_servico(sensor_atuador_cadastro_completo.uuid_sensor_atuador)
 
         if not sensor_atuador_status or not sensor_atuador_status["sensor_atuador_existe_bd"]:
-            raise Exception("O sensor ou atuador informado não existe na base de dados")
+            raise Exception("O sensor ou atuador informado não existe na base de dados (não foi precadastrado")
 
-        if sensor_atuador_status["sensor_atuador_foi_cadastrado"] == True:
-            raise Exception("O sensor ou atuador informado já foi cadastrado")
+        if sensor_atuador_status["sensor_atuador_foi_cadastrado"]:
+            raise Exception("O sensor ou atuador informado já foi cadastrado (cadastro completo)")
 
         # Chamar camada de serviços para cadastrar o sensor ou atuador na base de dados
-
+        sensor_atuador_cadastrado = cadastrar_sensor_atuador_servicos.cadastrar_sensor_atuador_sevico(sensor_atuador_cadastro_completo)
 
         return {"message": "Sensor ou atuador cadastrado com sucesso", "uuid": uuid}
     except Exception as e:
