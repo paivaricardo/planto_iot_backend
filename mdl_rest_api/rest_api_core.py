@@ -115,13 +115,13 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
         if not sensor_atuador_status or not sensor_atuador_status["sensor_atuador_existe_bd"]:
             raise Exception("O sensor ou atuador informado não existe na base de dados (não foi precadastrado")
 
-        if sensor_atuador_status["sensor_atuador_foi_cadastrado"]:
-            raise Exception("O sensor ou atuador informado já foi cadastrado (cadastro completo)")
-
         # Chamar camada de serviços para cadastrar o sensor ou atuador na base de dados
         sensor_atuador_cadastrado = cadastrar_sensor_atuador_servicos.cadastrar_sensor_atuador_sevico(sensor_atuador_cadastro_completo)
 
-        return {"message": "Sensor ou atuador cadastrado com sucesso", "uuid": uuid}
+        if sensor_atuador_cadastrado:
+            return {"message": f"Sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador} cadastrado com sucesso"}
+        else:
+            return {"message": f"Erro ao cadastrar o sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador}"}
     except Exception as e:
         raise HTTPException(status_code=400,
                             detail={"message": "Erro ao verificar se o sensor ou atuador existe na base de dados",
