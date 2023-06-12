@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import FastAPI, HTTPException
 
 from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_atuador_servicos, \
-    ativar_atuador_servicos, cadastrar_sensor_atuador_servicos
+    ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
 
 app = FastAPI()
@@ -119,10 +119,15 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
         sensor_atuador_cadastrado = cadastrar_sensor_atuador_servicos.cadastrar_sensor_atuador_sevico(sensor_atuador_cadastro_completo)
 
         if sensor_atuador_cadastrado:
-            return {"message": f"Sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador} cadastrado com sucesso"}
+            # Chamar a camada de serviços para conectar o usuário ao sensor (tabela tb_autorizacao_sensor)
+            sensor_atuador_conectado = conectar_usuario_sensor_servicos.conectar_usuario_sensor_servico(
+                sensor_atuador_cadastro_completo.uuid_sensor_atuador,
+                sensor_atuador_cadastro_completo.id_usuario_cadastrante)
+
+            return {"message": f"Sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador} cadastrado com sucesso", "conexao_usuario_sensor": sensor_atuador_conectado}
         else:
             return {"message": f"Erro ao cadastrar o sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador}"}
     except Exception as e:
         raise HTTPException(status_code=400,
-                            detail={"message": "Erro ao verificar se o sensor ou atuador existe na base de dados",
+                            detail={"message": "Erro ao tentar cadastrar o sensor ou atuador na base de dados",
                                     "error": str(e)})
