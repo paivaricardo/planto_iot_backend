@@ -38,7 +38,8 @@ class MQTTAdapter:
 
             # Create Kafka producer instance
             cls._instance.producer = KafkaProducer(
-                bootstrap_servers=cls._instance.kafka_bootstrap_server_string)
+                bootstrap_servers=cls._instance.kafka_bootstrap_server_string
+            )
 
             # Inicia o cliente MQTT em loop (nova Thread)
             cls._instance.client.loop_start()
@@ -67,4 +68,5 @@ class MQTTAdapter:
         self.client.disconnect()
 
         # Close the Kafka producer
+        self.producer.flush()
         self.producer.close()

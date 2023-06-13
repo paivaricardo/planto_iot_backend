@@ -11,5 +11,5 @@ class Usuario(Base):
     id_usuario = Column(Integer, primary_key=True)
     email_usuario = Column(String(255), nullable=False)
     nome_usuario = Column(String(255), nullable=False)
-    data_cadastro = Column(Date, nullable=False)
+    data_cadastro = Column(Date, nullable=False, server_default='CURRENT_DATE')
     id_perfil = Column(Integer, ForeignKey(Perfil.id_perfil), nullable=False)

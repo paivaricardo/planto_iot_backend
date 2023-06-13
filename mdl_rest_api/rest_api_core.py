@@ -1,10 +1,13 @@
+import json
 from uuid import UUID
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 
 from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_atuador_servicos, \
-    ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos
+    ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos, \
+    verificar_cadastrar_usuario_servicos
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
+from model.pydantic_rest_models.usuario_rest_model import UsuarioRestModel
 
 app = FastAPI()
 
@@ -29,7 +32,7 @@ def precadastrar_sensor_ou_atuador(id_tipo_sensor: int):
         # Chamar a chamada de serviços para precadastrar um sensor ou um atuador
         uuid_gerado = precadastrar_sensor_atuador_servicos.precadastrar_sensor_atuador_servico(id_tipo_sensor)
 
-        return {"status": "pre-cadastrado", "uuid": uuid_gerado}
+        return Response(content={"status": "pre-cadastrado", "uuid": uuid_gerado}, status_code=201)
     except Exception as e:
         raise HTTPException(status_code=400,
                             detail={"message": "Erro ao precadastrar o sensor ou atuador", "error": str(e)})
@@ -110,13 +113,15 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
             raise Exception("UUID não informado")
 
         # Chamar camada de serviços para verificar se o sensor ou atuador realmente existe na base de dados
-        sensor_atuador_status = verificar_sensor_atuador_servicos.verificar_existencia_sensor_atuador_servico(sensor_atuador_cadastro_completo.uuid_sensor_atuador)
+        sensor_atuador_status = verificar_sensor_atuador_servicos.verificar_existencia_sensor_atuador_servico(
+            sensor_atuador_cadastro_completo.uuid_sensor_atuador)
 
         if not sensor_atuador_status or not sensor_atuador_status["sensor_atuador_existe_bd"]:
             raise Exception("O sensor ou atuador informado não existe na base de dados (não foi precadastrado")
 
         # Chamar camada de serviços para cadastrar o sensor ou atuador na base de dados
-        sensor_atuador_cadastrado = cadastrar_sensor_atuador_servicos.cadastrar_sensor_atuador_sevico(sensor_atuador_cadastro_completo)
+        sensor_atuador_cadastrado = cadastrar_sensor_atuador_servicos.cadastrar_sensor_atuador_sevico(
+            sensor_atuador_cadastro_completo)
 
         if sensor_atuador_cadastrado:
             # Chamar a camada de serviços para conectar o usuário ao sensor (tabela tb_autorizacao_sensor)
@@ -124,10 +129,49 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
                 sensor_atuador_cadastro_completo.uuid_sensor_atuador,
                 sensor_atuador_cadastro_completo.id_usuario_cadastrante)
 
-            return {"message": f"Sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador} cadastrado com sucesso", "conexao_usuario_sensor": sensor_atuador_conectado}
+            return {
+                "message": f"Sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador} cadastrado com sucesso",
+                "conexao_usuario_sensor": sensor_atuador_conectado}
         else:
-            return {"message": f"Erro ao cadastrar o sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador}"}
+            return {
+                "message": f"Erro ao cadastrar o sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador}"}
     except Exception as e:
         raise HTTPException(status_code=400,
                             detail={"message": "Erro ao tentar cadastrar o sensor ou atuador na base de dados",
+                                    "error": str(e)})
+
+
+@app.post("/verificar-cadastrar-usuario")
+def verificar_cadastrar_usuario(usuario_rest_model: UsuarioRestModel):
+    """
+    Verifica se um usuário existe na base de dados do Planto Iot, com base no e-mail fornecido. Se ele não existir, um novo cadastro é realizado para esse usuário. É devolvido um id de usuário (verificado ou cadastrado), para utilização na aplicação.
+    """
+
+    try:
+        if not usuario_rest_model.email_usuario:
+            raise Exception("E-mail não informado")
+
+        if not usuario_rest_model.nome_usuario:
+            raise Exception("Nome do usuário não informado")
+
+        if not usuario_rest_model.id_perfil:
+            raise Exception("Perfil do usuário não informado")
+
+        # Chamar camada de serviços para verificar se o sensor ou atuador realmente existe na base de dados
+        usuario_status = verificar_cadastrar_usuario_servicos.verificar_cadastrar_usuario_servico(usuario_rest_model)
+
+        if usuario_status["usuario_ja_existe_bd"]:
+            return {
+                "message": f"Usuário com o e-mail: {usuario_rest_model.email_usuario} já existe na base de dados.",
+                "usuario": usuario_status["usuario_cadastrado"]}
+        else:
+            message_string = f"Usuário com o e-mail: {usuario_rest_model.email_usuario} não existia na base de dados. Usuário cadastrado com sucesso."
+            usuario_status = usuario_status["usuario_cadastrado"]
+
+            return {
+                "message": message_string,
+                "usuario": usuario_status}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={"message": "Erro ao tentar verificar ou cadastrar o usuário na base de dados",
                                     "error": str(e)})
