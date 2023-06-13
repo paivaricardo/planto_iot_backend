@@ -65,7 +65,7 @@ CREATE TABLE tb_usuario
    id_usuario int NOT NULL GENERATED ALWAYS AS IDENTITY,
    email_usuario varchar(255) NOT NULL,
    nome_usuario varchar(255) NOT NULL,
-   data_cadastro date NOT NULL,
+   data_cadastro date NOT NULL DEFAULT CURRENT_DATE,
    id_perfil int NOT NULL,
    CONSTRAINT PK_tb_usuario PRIMARY KEY (id_usuario)
 );
@@ -182,7 +182,7 @@ ALTER TABLE tb_usuario
    ADD CONSTRAINT FK_id_perfil_tb_usuario FOREIGN KEY (id_perfil) REFERENCES tb_perfil (id_perfil);
 
 
--- ************************************** tb_autorizacao_sensor (FK)
+-- ************************************** tb_autoriyzacao_sensor (FK)
 ALTER TABLE tb_autorizacao_sensor
     ADD CONSTRAINT FK_id_sensor_atuador_tb_sensor_atuador FOREIGN KEY ( id_sensor_atuador ) REFERENCES tb_sensor_atuador ( id_sensor_atuador ),
     ADD CONSTRAINT FK_id_usuario_tb_usuario FOREIGN KEY ( id_usuario ) REFERENCES tb_usuario ( id_usuario ),

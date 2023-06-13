@@ -1,11 +1,10 @@
-import json
 from uuid import UUID
 
 from fastapi import FastAPI, HTTPException, Response
 
 from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_atuador_servicos, \
     ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos, \
-    verificar_cadastrar_usuario_servicos
+    verificar_cadastrar_usuario_servicos, listar_sensores_atuadores_conectados_servicos
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
 from model.pydantic_rest_models.usuario_rest_model import UsuarioRestModel
 
@@ -171,6 +170,26 @@ def verificar_cadastrar_usuario(usuario_rest_model: UsuarioRestModel):
             return {
                 "message": message_string,
                 "usuario": usuario_status}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={"message": "Erro ao tentar verificar ou cadastrar o usuário na base de dados",
+                                    "error": str(e)})
+
+
+@app.get("/listar-sensores-atuadores-conectados/{id_usuario}")
+def listar_sensores_atuadores_conectados(id_usuario: int):
+    """
+    Retorna uma lista de todos os sensores e atuadores que estão conectados a determinado usuário (atributo visualizacao_ativa da tb_autorizacao_sensor setado como True).
+    """
+
+    try:
+        if not id_usuario:
+            raise Exception("ID do usuário não informado")
+
+        # Chamar camada de serviços para obter uma lista de todos os sensores e atuadores conectados a um determinado usuário
+        listar_sensores_atuadores_conectados = listar_sensores_atuadores_conectados_servicos.listar_sensores_atuadores_conectados_servico(id_usuario)
+
+        return listar_sensores_atuadores_conectados
     except Exception as e:
         raise HTTPException(status_code=400,
                             detail={"message": "Erro ao tentar verificar ou cadastrar o usuário na base de dados",
