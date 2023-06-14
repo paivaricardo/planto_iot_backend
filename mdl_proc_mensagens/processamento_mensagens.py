@@ -1,6 +1,8 @@
 import logging
+import os
 from datetime import datetime
 
+from dotenv import load_dotenv
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
 import json
@@ -9,8 +11,11 @@ from mdl_validador_mensagens import validacao_mensagens
 from mdl_dao import dao_mensagens_sensores_atuadores
 
 def processar_mensagem(message, topic):
-    #
     logging.info("[PROC MENSAGENS - INFO] Iniciado o processamento da mensagem.")
+
+    # Carregar as variáveis de ambiente do arquivo .env
+    load_dotenv()
+
     try:
         # Decodificar a mensagem em json para um dicionário Python:
         print("[PROC MENSAGENS - INFO] Mensagem recebida:", message)
@@ -61,7 +66,7 @@ def processamento_mensagens_kafka_consumer_thread():
     # Instanciar um consumidor Kafka para receber mensagens oriundas do broker Kafka, após relay de mensagens do MQTT
     consumer = KafkaConsumer(
         "planto-iot-sensores-kafka",
-        bootstrap_servers="18.214.223.254:9092"
+        bootstrap_servers=f"{os.environ.get('KAFKA_HOST')}:{os.environ.get('KAFKA_PORT')}"
     )
 
     # Assim que o consumidor Kafka receber uma mensagem, enviar para processamento
