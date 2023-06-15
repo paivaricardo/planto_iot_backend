@@ -1,6 +1,8 @@
+from uuid import UUID
+
 from mdl_dao import dao_verificar_sensor_atuador
 
-def verificar_existencia_sensor_atuador_servico(uuid: str):
+def verificar_existencia_sensor_atuador_servico(uuid: UUID):
     """
     Verifica se um sensor ou atuador foi precadastrado na base de dados e se o cadastro dele foi completo ou não.
 

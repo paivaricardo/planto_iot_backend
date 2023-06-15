@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -7,7 +8,7 @@ from model.autorizacao_sensor_model import AutorizacaoSensor
 from model.sensor_atuador_model import SensorAtuador
 
 
-def verificar_existencia_sensor_atuador_base_dados(uuid_informado: str):
+def verificar_existencia_sensor_atuador_base_dados(uuid_informado: UUID):
     # Criar uma sessão para acesso ao banco de dados
     session = database.create_session()
 
@@ -15,7 +16,7 @@ def verificar_existencia_sensor_atuador_base_dados(uuid_informado: str):
 
         # Buscar se há uma correspondência do UUID informado para um atuador na base de dados
         sensor_atuador = session.query(SensorAtuador).filter(
-            SensorAtuador.uuid_sensor_atuador == uuid_informado).first()
+            SensorAtuador.uuid_sensor_atuador == str(uuid_informado)).first()
 
         try:
             sensor_atuador_cadastrado = bool(
