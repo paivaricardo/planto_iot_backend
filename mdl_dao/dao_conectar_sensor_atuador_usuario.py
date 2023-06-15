@@ -7,9 +7,10 @@ from model.autorizacao_sensor_model import AutorizacaoSensor
 
 
 def conectar_sensor_atuador_usuario_dao(autorizacao_usuario):
+    # Criar uma sessão para acesso ao banco de dados
+    session = database.create_session()
+
     try:
-        # Criar uma sessão para acesso ao banco de dados
-        session = database.create_session()
 
         # Buscar se há uma correspondência do id da autorizacao para uma autorizacao na base de dados
         autorizacao_usuario_database = session.query(AutorizacaoSensor).filter(

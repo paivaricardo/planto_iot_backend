@@ -9,9 +9,10 @@ from model.usuario_model import Usuario
 
 
 def verificar_autorizacao_acesso_sensor_database(uuid_sensor: str, email_usuario: str):
+    # Criar uma sessão para acesso ao banco de dados
+    session = database.create_session()
+
     try:
-        # Criar uma sessão para acesso ao banco de dados
-        session = database.create_session()
 
         # Buscar se há um usuário correspondente ao email informado na base de dados
         usuario = session.query(Usuario).filter(
