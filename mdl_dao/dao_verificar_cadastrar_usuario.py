@@ -38,9 +38,10 @@ def cadastrar_usuario_base_dados(usuario_rest_model: UsuarioRestModel):
 
 
 def verificar_usuario_base_dados(usuario_rest_model):
+    # Criar uma sessão para acesso ao banco de dados
+    session = database.create_session()
+
     try:
-        # Criar uma sessão para acesso ao banco de dados
-        session = database.create_session()
 
         # Consultar a base de dados, para ver se o usuário foi localizado. Se não for, o método first() retorna None
         usuario_busca = session.query(Usuario).filter(
@@ -60,3 +61,5 @@ def verificar_usuario_base_dados(usuario_rest_model):
     except SQLAlchemyError as e:
         logging.error(f"[DAO - ERRO] Erro ao tentar verificar se o usuário existe na base de dados: {str(e)}")
         raise Exception(f"Erro ao tentar verificar se o usuário existe na base de dados: {str(e)}")
+    finally:
+        session.close()

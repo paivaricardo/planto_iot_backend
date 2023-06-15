@@ -46,3 +46,5 @@ def verificar_autorizacao_acesso_sensor_database(uuid_sensor: str, email_usuario
     except SQLAlchemyError as e:
         logging.error(f"[DAO - ERRO] Erro ao verificar se o atuador existe na base de dados: {str(e)}")
         raise Exception("Erro ao verificar se o atuador existe na base de dados", str(e))
+    finally:
+        session.close()

@@ -7,9 +7,10 @@ from model.sensor_atuador_model import SensorAtuador
 
 
 def verificar_existencia_atuador_base_dados(uuid_informado: str):
+    # Criar uma sessão para acesso ao banco de dados
+    session = database.create_session()
+
     try:
-        # Criar uma sessão para acesso ao banco de dados
-        session = database.create_session()
 
         # Buscar se há uma correspondência do UUID informado para um atuador na base de dados
         atuador = session.query(SensorAtuador).filter(SensorAtuador.uuid_sensor_atuador == uuid_informado).first()
@@ -24,3 +25,5 @@ def verificar_existencia_atuador_base_dados(uuid_informado: str):
     except SQLAlchemyError as e:
         logging.error(f"[DAO - ERRO] Erro ao verificar se o atuador existe na base de dados: {str(e)}")
         raise Exception("Erro ao verificar se o atuador existe na base de dados", str(e))
+    finally:
+        session.close()

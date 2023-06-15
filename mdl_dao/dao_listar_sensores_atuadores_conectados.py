@@ -2,15 +2,19 @@ import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from mdl_dao import database
+from mdl_dao import database, dao_buscar_id_usuario_com_email
 from model.autorizacao_sensor_model import AutorizacaoSensor
 from model.query_models.sensor_atuador_query_model import SensorAtuadorQueryModel
 
 
-def listar_sensores_atuadores_conectados_bd(id_usuario):
+def listar_sensores_atuadores_conectados_bd(email_usuario: str):
+    # Criar uma sessão para acesso ao banco de dados
+    session = database.create_session()
+
     try:
-        # Criar uma sessão para acesso ao banco de dados
-        session = database.create_session()
+
+        # Buscar o id do usuário correspondente ao email informado
+        id_usuario = dao_buscar_id_usuario_com_email.buscar_id_usuario_com_email(email_usuario)
 
         # Subquery para buscar os sensores e atuadores que o usuário tem permissão de visualizar
         subquery_sensores_atuadores_permissao_visualizacao = session.query(AutorizacaoSensor.id_sensor_atuador).filter(

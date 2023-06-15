@@ -1,3 +1,4 @@
+import logging
 from uuid import UUID
 
 from fastapi import FastAPI, HTTPException, Response
@@ -146,6 +147,8 @@ def verificar_cadastrar_usuario(usuario_rest_model: UsuarioRestModel):
     Verifica se um usuário existe na base de dados do Planto Iot, com base no e-mail fornecido. Se ele não existir, um novo cadastro é realizado para esse usuário. É devolvido um id de usuário (verificado ou cadastrado), para utilização na aplicação.
     """
 
+    logging.info(f"[REST - INFO] Iniciando a verificação de cadastro do usuário {usuario_rest_model.nome_usuario} (email {usuario_rest_model.email_usuario})")
+
     try:
         if not usuario_rest_model.email_usuario:
             raise Exception("E-mail não informado")
@@ -176,21 +179,21 @@ def verificar_cadastrar_usuario(usuario_rest_model: UsuarioRestModel):
                                     "error": str(e)})
 
 
-@app.get("/listar-sensores-atuadores-conectados/{id_usuario}")
-def listar_sensores_atuadores_conectados(id_usuario: int):
+@app.get("/listar-sensores-atuadores-conectados")
+def listar_sensores_atuadores_conectados(email_usuario: str):
     """
     Retorna uma lista de todos os sensores e atuadores que estão conectados a determinado usuário (atributo visualizacao_ativa da tb_autorizacao_sensor setado como True).
     """
 
     try:
-        if not id_usuario:
-            raise Exception("ID do usuário não informado")
+        if not email_usuario:
+            raise Exception("Email do usuário não informado")
 
         # Chamar camada de serviços para obter uma lista de todos os sensores e atuadores conectados a um determinado usuário
-        listar_sensores_atuadores_conectados = listar_sensores_atuadores_conectados_servicos.listar_sensores_atuadores_conectados_servico(id_usuario)
+        listar_sensores_atuadores_conectados = listar_sensores_atuadores_conectados_servicos.listar_sensores_atuadores_conectados_servico(email_usuario)
 
         return listar_sensores_atuadores_conectados
     except Exception as e:
         raise HTTPException(status_code=400,
-                            detail={"message": "Erro ao tentar verificar ou cadastrar o usuário na base de dados",
+                            detail={"message": "Erro ao tentar listar os sensores e atuadores conectados ao usuário na base de dados",
                                     "error": str(e)})

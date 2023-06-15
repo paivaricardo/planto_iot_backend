@@ -19,5 +19,6 @@ def create_session():
     engine = create_engine(connection_string)
     Session = sessionmaker(bind=engine)
     session = Session()
+
     return session
 

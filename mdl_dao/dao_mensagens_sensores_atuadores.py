@@ -49,9 +49,10 @@ def persistir_leitura_sensor_atuador(mensagem_dict):
 
 
 def persistir_ack_atuador(mensagem_dict):
+    # Criar uma sessão para acesso ao banco de dados
+    session = database.create_session()
+
     try:
-        # Criar uma sessão para acesso ao banco de dados
-        session = database.create_session()
 
         # Buscar id do sensor atuador no banco de dados, gravar na variável sensor_atuador
         sensor_atuador = session.query(SensorAtuador).filter(SensorAtuador.uuid_sensor_atuador == mensagem_dict['uuidSensorAtuador']).first()
