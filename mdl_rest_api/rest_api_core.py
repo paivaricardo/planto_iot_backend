@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException, Response
 from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_atuador_servicos, \
     ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos, \
     verificar_cadastrar_usuario_servicos, listar_sensores_atuadores_conectados_servicos, \
-    verificar_autorizacao_acesso_sensor_servicos
+    verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
 from model.pydantic_rest_models.usuario_rest_model import UsuarioRestModel
 
@@ -245,3 +245,14 @@ def conectar_sensor_atuador(uuid_sensor_atuador: UUID, email_usuario: str):
                             detail={
                                 "message": "Erro ao tentar conectar um usuário a um sensor na base de dados",
                                 "error": str(e)})
+
+@app.get("/culturas")
+def get_culturas():
+    culturas = cultura_servicos.obter_culturas_servico()
+    return culturas
+
+
+@app.get("/areas")
+def get_areas():
+    areas = area_servicos.obter_areas_servico()
+    return areas
