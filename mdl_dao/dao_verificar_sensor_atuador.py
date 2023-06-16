@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from mdl_dao import database
 from model.autorizacao_sensor_model import AutorizacaoSensor
-from model.sensor_atuador_model import SensorAtuador
+from model.query_models.sensor_atuador_query_model import SensorAtuadorQueryModel
 
 
 def verificar_existencia_sensor_atuador_base_dados(uuid_informado: UUID):
@@ -15,8 +15,8 @@ def verificar_existencia_sensor_atuador_base_dados(uuid_informado: UUID):
     try:
 
         # Buscar se há uma correspondência do UUID informado para um atuador na base de dados
-        sensor_atuador = session.query(SensorAtuador).filter(
-            SensorAtuador.uuid_sensor_atuador == str(uuid_informado)).first()
+        sensor_atuador = session.query(SensorAtuadorQueryModel).filter(
+            SensorAtuadorQueryModel.uuid_sensor_atuador == str(uuid_informado)).first()
 
         try:
             sensor_atuador_cadastrado = bool(

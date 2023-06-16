@@ -12,8 +12,9 @@ def conectar_usuario_sensor_servico(uuid_sensor_atuador: UUID, email_usuario: st
     2 - Usuário já está conectado ao sensor ou atuador.
     3 - Erro. Sensor ou atuador não existe na base de dados.
     4 - Erro. Sensor/atuador existe, mas o usuário não possui autorização para acesso ao sensor/atuador.
-    5 - Erro. Usuário não existe na base de dados.
-    6 - Erro desconhecido ao tentar conectar o usuário ao sensor/atuador.
+    5 - Erro. Cadastro do sensor não foi completado. É necessário completar o cadastro do sensor para que ele possa ser utilizado.
+    6 - Erro. Usuário não existe na base de dados.
+    7 - Erro desconhecido ao tentar conectar o usuário ao sensor/atuador.
     """
     try:
         # Chamar o DAO para verificar se o sensor ou atuador existe na base de dados, e se o cadastro foi completo ou não
@@ -29,7 +30,7 @@ def conectar_usuario_sensor_servico(uuid_sensor_atuador: UUID, email_usuario: st
 
         # Se o usuário não existe na base de dados, retornar o código correspondente (vide acima)
         if not id_usuario:
-            return {"cod_status_conexao": 5, "mensagem": "Erro. Usuário não existe na base de dados."}
+            return {"cod_status_conexao": 6, "mensagem": "Erro. Usuário não existe na base de dados."}
 
         # Retornar a lista de autorizações para um usuário em determinado sensor. É nessa autorização que será determinada a conexão do usuário, na coluna visualizacao_ativa
         autorizacoes_usuario = [autorizacao for autorizacao in sensor_atuador_existe["autorizacoes"] if
@@ -38,6 +39,10 @@ def conectar_usuario_sensor_servico(uuid_sensor_atuador: UUID, email_usuario: st
         # Se não houver autorização para o usuário, retornar o código correspondente (vide acima)
         if len(autorizacoes_usuario) == 0:
             return {"cod_status_conexao": 4, "mensagem": "Erro. Sensor/atuador existe, mas o usuário não possui autorização para acesso ao sensor/atuador."}
+
+        # Se o cadastro do sensor não foi completado, retornar o código correspondente (vide acima)
+        if not sensor_atuador_existe["sensor_atuador_foi_cadastrado"]:
+            return {"cod_status_conexao": 5, "mensagem": "Erro. Cadastro do sensor não foi completado. É necessário completar o cadastro do sensor para que ele possa ser utilizado."}
 
         # Verificar se o usuário já está conectado ao sensor ou atuador. Se sim, não será feita a conexão e será devolvido o código correspondente (vide acima)
         if autorizacoes_usuario[0]["visualizacao_ativa"]:
@@ -51,4 +56,4 @@ def conectar_usuario_sensor_servico(uuid_sensor_atuador: UUID, email_usuario: st
             if sensor_atuador_conectado_usuario:
                 return {"cod_status_conexao": 1, "mensagem": "Conexão realizada com sucesso."}
     except Exception as e:
-        return {"cod_status_conexao": 6, "mensagem": f"Erro desconhecido ao tentar conectar o usuário ao sensor/atuador: {str(e)}"}
+        return {"cod_status_conexao": 7, "mensagem": f"Erro desconhecido ao tentar conectar o usuário ao sensor/atuador: {str(e)}"}
