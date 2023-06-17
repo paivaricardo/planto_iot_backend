@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, UniqueConstraint, Text
 from sqlalchemy.ext.declarative import declarative_base
 
 from model.area_model import Area
@@ -23,6 +23,7 @@ class SensorAtuador(Base):
     id_area = Column(Integer, ForeignKey(Area.id_area))
     id_cultura = Column(Integer, ForeignKey(Cultura.id_cultura))
     id_tipo_sensor = Column(Integer, ForeignKey(TipoSensor.id_tipo_sensor))
+    observacoes = Column(Text)
 
     __table_args__ = (
         UniqueConstraint('uuid_sensor_atuador', name='idx_uuid_sensor'),

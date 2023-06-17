@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -12,3 +13,4 @@ class SensorAtuadorCadastroCompleto(BaseModel):
     email_usuario_cadastrante: str
     id_area: int
     id_cultura: int
+    observacoes: Optional[str]

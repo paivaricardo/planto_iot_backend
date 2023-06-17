@@ -16,6 +16,7 @@ CREATE TABLE tb_sensor_atuador
    id_area int NULL,
    id_cultura int NULL,
    id_tipo_sensor int NOT NULL,
+   observacoes text NULL,
    CONSTRAINT PK_tb_sensor_atuador PRIMARY KEY (id_sensor_atuador),
    CONSTRAINT IDX_UUID_SENSOR UNIQUE (uuid_sensor_atuador)
 );

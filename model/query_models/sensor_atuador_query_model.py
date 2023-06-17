@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Date, UniqueConstraint, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Date, UniqueConstraint, ForeignKey, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, column_property
 
@@ -20,6 +20,7 @@ class SensorAtuadorQueryModel(Base):
     longitude = Column(Float)
     data_cadastro_sensor = Column(Date)
     data_precadastro_sensor = Column(Date, nullable=False, server_default='CURRENT_DATE')
+    observacoes = Column(Text)
 
     # Chaves estrangeiras
     id_usuario_cadastrante = Column(Integer, ForeignKey(Usuario.id_usuario))

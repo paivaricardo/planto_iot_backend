@@ -29,6 +29,7 @@ def cadastrar_sensor_atuador_base_dados(sensor_atuador_cadastro_completo: Sensor
             sensor_atuador.id_usuario_cadastrante = sensor_atuador.id_usuario_cadastrante or id_usuario_cadastrante
             sensor_atuador.id_area = sensor_atuador_cadastro_completo.id_area
             sensor_atuador.id_cultura = sensor_atuador_cadastro_completo.id_cultura
+            sensor_atuador.observacoes = sensor_atuador_cadastro_completo.observacoes
 
         # Fazer o update com base nas novas informações de cadastro fornecidas
         session.add(sensor_atuador)
