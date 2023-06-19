@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 from uuid import UUID
 
 from fastapi import FastAPI, HTTPException, Response
@@ -6,7 +7,8 @@ from fastapi import FastAPI, HTTPException, Response
 from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_atuador_servicos, \
     ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos, \
     verificar_cadastrar_usuario_servicos, listar_sensores_atuadores_conectados_servicos, \
-    verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos
+    verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos, \
+    listar_ultimas_leituras_sensor_atuador_servicos
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
 from model.pydantic_rest_models.usuario_rest_model import UsuarioRestModel
 
@@ -21,7 +23,7 @@ def health_check():
     return {"status": "ok"}
 
 
-@app.get("/pre-cadastrar-sensor-atuador")
+@app.post("/pre-cadastrar-sensor-atuador")
 def precadastrar_sensor_ou_atuador(id_tipo_sensor: int):
     """
     Precadastra um sensor ou um atuador na base de dados.
@@ -39,7 +41,7 @@ def precadastrar_sensor_ou_atuador(id_tipo_sensor: int):
                             detail={"message": "Erro ao precadastrar o sensor ou atuador", "error": str(e)})
 
 
-@app.get("/ativar-atuador/{uuid}")
+@app.put("/ativar-atuador/{uuid}")
 def ativar_atuador(uuid: UUID, quantidade_atuacao: int):
     """
     Envia sinal para ativação de um atuador específico no Planto IoT. O sinal é direcionado ao atuador com o uuid informado. A intensidade de ativação de um atuador é definida por meio de um queryParam de quantidade_atuacao.
@@ -66,7 +68,7 @@ def ativar_atuador(uuid: UUID, quantidade_atuacao: int):
                 "quantidade_atuacao": quantidade_atuacao}
     except Exception as e:
         raise HTTPException(status_code=400,
-                            detail={"message": "Erro ao enviar sinal para ativação da autação", "error": str(e)})
+                            detail={"message": "Erro ao enviar sinal para ativação da atuação", "error": str(e)})
 
 
 @app.get("/verificar-sensor-atuador/{uuid}")
@@ -125,7 +127,9 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
             raise Exception("O sensor ou atuador informado não existe na base de dados (não foi precadastrado")
 
         # Chamar a camada de serviços para verificar se o usuário possui permissão de acesso ao sensor ou atuador
-        status_sensor_atuador_autorizacao = verificar_autorizacao_acesso_sensor_servicos.verificar_autorizacao_acesso_sensor_servico(sensor_atuador_cadastro_completo.uuid_sensor_atuador, sensor_atuador_cadastro_completo.email_usuario_cadastrante)
+        status_sensor_atuador_autorizacao = verificar_autorizacao_acesso_sensor_servicos.verificar_autorizacao_acesso_sensor_servico(
+            sensor_atuador_cadastro_completo.uuid_sensor_atuador,
+            sensor_atuador_cadastro_completo.email_usuario_cadastrante)
 
         # Se o usuário não possuir autorização de acesso ao sensor ou atuador, não será possível possuir no cadastro do sensor ou atuador
         if not status_sensor_atuador_autorizacao["usuario_autorizado"]:
@@ -133,7 +137,8 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
 
         # Exigir permissão de administrador para cadastrar um sensor ou atuador
         if status_sensor_atuador_autorizacao["perfil_autorizacao"].id_perfil_autorizacao != 1:
-            raise Exception(f"O usuário necessita permissão de administrador para cadastrar um sensor ou atuador. A permissão atual do usuário é apenas de {status_sensor_atuador_autorizacao['perfil_autorizacao'].id_perfil_autorizacao}")
+            raise Exception(
+                f"O usuário necessita permissão de administrador para cadastrar um sensor ou atuador. A permissão atual do usuário é apenas de {status_sensor_atuador_autorizacao['perfil_autorizacao'].id_perfil_autorizacao}")
 
         # Chamar camada de serviços para cadastrar o sensor ou atuador na base de dados
         sensor_atuador_cadastrado = cadastrar_sensor_atuador_servicos.cadastrar_sensor_atuador_sevico(
@@ -245,6 +250,39 @@ def conectar_sensor_atuador(uuid_sensor_atuador: UUID, email_usuario: str):
                             detail={
                                 "message": "Erro ao tentar conectar um usuário a um sensor na base de dados",
                                 "error": str(e)})
+
+
+@app.get("/listar-ultimas-leituras-sensor-atuador/{uuid_sensor_atuador}")
+def listar_ultimas_leituras_sensor_atuador(uuid_sensor_atuador: UUID, num_ultimas_leituras: Optional[int] = 5,
+                                           filtragem_tipo_sinal: Optional[int] = 0):
+    """
+    Lista as últimas leituras de um determinado sensor ou atuador, com base no uuid do sensor ou do atuador e no número de leituras que devem ser retornadas. Se um parâmetro de filtragem de tipo de sinal for informado, apenas os sinais do tipo informado serão retornados.
+
+    :param uuid_sensor_atuador: UUID do sensor ou atuador. Parâmetro obrigatório.
+    :param num_ultimas_leituras: Número de leituras que devem ser retornadas. Se nenhum for informado, o valor padrão é 5.
+    :param filtragem_tipo_sinal: Tipo de sinal que deve ser filtrado. Se nenhum for informado, não haverá filtragem de sinais.
+    :return:
+    """
+
+    try:
+        if not uuid_sensor_atuador:
+            raise Exception("UUID do sensor ou atuador não informado")
+
+        if not num_ultimas_leituras:
+            num_ultimas_leituras = 5
+
+        if not filtragem_tipo_sinal:
+            filtragem_tipo_sinal = 0
+
+        return listar_ultimas_leituras_sensor_atuador_servicos.listar_ultimas_leituras_sensor_atuador_servico(
+            uuid_sensor_atuador, num_ultimas_leituras, filtragem_tipo_sinal)
+
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "message": "Erro ao tentar listar as últimas leituras de um sensor ou do atuador na base de dados",
+                                "error": str(e)})
+
 
 @app.get("/culturas")
 def get_culturas():

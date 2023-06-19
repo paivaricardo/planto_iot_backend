@@ -10,6 +10,7 @@ def enviar_sinal_atuador(uuid_atuador: str, quantidade_atuacao: int):
     """
     try:
         topico_ativacao_atuacao = f"planto-iot-sensores/atuadores/{uuid_atuador}/A"
+
         payload_mensagem_ativacao_atuacao = {
             "uuidSensorAtuador": uuid_atuador,
             "dataHoraAcionamentoLeitura": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
@@ -20,6 +21,7 @@ def enviar_sinal_atuador(uuid_atuador: str, quantidade_atuacao: int):
         # Instanciar o adaptador MQTT (instância singleton do adaptador MQTT)
         mqtt_adapter = MQTTAdapter()
 
+        # Publicar a mensagem de ativação do atuador no tópico, direcionada ao broker MQTT
         mqtt_adapter.publish(topico_ativacao_atuacao, json.dumps(payload_mensagem_ativacao_atuacao))
 
         return True

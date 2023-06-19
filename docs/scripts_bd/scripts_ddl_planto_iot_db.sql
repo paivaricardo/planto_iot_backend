@@ -183,7 +183,7 @@ ALTER TABLE tb_usuario
    ADD CONSTRAINT FK_id_perfil_tb_usuario FOREIGN KEY (id_perfil) REFERENCES tb_perfil (id_perfil);
 
 
--- ************************************** tb_autoriyzacao_sensor (FK)
+-- ************************************** tb_autorizacao_sensor (FK)
 ALTER TABLE tb_autorizacao_sensor
     ADD CONSTRAINT FK_id_sensor_atuador_tb_sensor_atuador FOREIGN KEY ( id_sensor_atuador ) REFERENCES tb_sensor_atuador ( id_sensor_atuador ),
     ADD CONSTRAINT FK_id_usuario_tb_usuario FOREIGN KEY ( id_usuario ) REFERENCES tb_usuario ( id_usuario ),
