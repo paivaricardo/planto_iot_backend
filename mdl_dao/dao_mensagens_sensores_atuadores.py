@@ -75,6 +75,7 @@ def persistir_ack_atuador(mensagem_dict):
 
     except SQLAlchemyError as e:
         session.rollback()
+
         logging.error(f"Erro ocorreu ao processar o ack do acionamento do atuador: {str(e)}")
     finally:
         session.close()

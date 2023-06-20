@@ -53,8 +53,10 @@ def registrar_ativacao_atuador_base_dados(uuid_atuador: str, quantidade_atuacao:
         )
 
         session.add(leitura_atuacao)
-
         session.commit()
+
+        logging.info(
+            f"[DAO - INFO] Sinal de acionamento do atuador registrado com sucesso na base de dados. Gerado o id: {leitura_atuacao.id_leitura_atuacao}")
 
         return leitura_atuacao
 
