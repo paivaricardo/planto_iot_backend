@@ -64,11 +64,11 @@ def ativar_atuador(uuid: UUID, quantidade_atuacao: int):
         if not interacao_atuador_bem_sucedida:
             raise Exception("Erro ao enviar sinal para ativação da atuação")
 
-        return {"message": "Sinal para ativação da atuação completado com sucesso", "uuid": uuid,
+        return {"status": "success", "message": "Sinal para ativação da atuação completado com sucesso", "uuid": uuid,
                 "quantidade_atuacao": quantidade_atuacao}
     except Exception as e:
         raise HTTPException(status_code=400,
-                            detail={"message": "Erro ao enviar sinal para ativação da atuação", "error": str(e)})
+                            detail={"status": "fail", "message": "Erro ao enviar sinal para ativação da atuação", "error": str(e)})
 
 
 @app.get("/verificar-sensor-atuador/{uuid}")
