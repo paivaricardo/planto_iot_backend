@@ -32,7 +32,7 @@ def verificar_existencia_atuador_base_dados(uuid_informado: str):
         session.close()
 
 
-def registar_ativacao_atuador_base_dados(uuid_atuador: str, quantidade_atuacao: int):
+def registrar_ativacao_atuador_base_dados(uuid_atuador: str, quantidade_atuacao: int):
     # Criar uma sessão para acesso ao banco de dados
     session = database.create_session()
 
@@ -42,7 +42,7 @@ def registar_ativacao_atuador_base_dados(uuid_atuador: str, quantidade_atuacao: 
         atuador = session.query(SensorAtuador).filter(SensorAtuador.uuid_sensor_atuador == uuid_atuador).first()
 
         if not atuador:
-            logging.info(f"[DAO - INFO] Atuador com o UUID {uuid_atuador} não encontrado no banco de dados.")
+            logging.error(f"[DAO - ERRO] Atuador com o UUID {uuid_atuador} não encontrado no banco de dados.")
             raise Exception(f"[DAO - ERRO] Atuador com o UUID {uuid_atuador} não encontrado no banco de dados.")
 
         leitura_atuacao = LeituraAtuacao(

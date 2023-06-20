@@ -65,7 +65,7 @@ def ativar_atuador(uuid: UUID, quantidade_atuacao: int):
             raise Exception("Erro ao enviar sinal para ativação da atuação")
 
         # Registrar a ativação do atuador no banco de dados
-        registro_ativacao_atuador = ativar_atuador_servicos.registar_ativacao_atuador_servico(str(uuid), quantidade_atuacao)
+        registro_ativacao_atuador = ativar_atuador_servicos.registrar_ativacao_atuador_servico(str(uuid), quantidade_atuacao)
 
         return {"status": "success", "message": "Sinal para ativação da atuação completado com sucesso", "registroAtivacaoAtuador": registro_ativacao_atuador}
     except Exception as e:
