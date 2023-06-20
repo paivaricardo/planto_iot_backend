@@ -11,7 +11,7 @@ from mqtt_adaptador.mqtt_adaptador import MQTTAdapter
 
 if __name__ == '__main__':
     # Definir nível de log
-    logging.basicConfig(filename="application.log", level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(filename="application.log", level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
     # Carregar as variáveis de ambiente do arquivo .env
     load_dotenv()
