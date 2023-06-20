@@ -27,3 +27,16 @@ def ativar_atuador_servico(uuid_atuador: str, quantidade_atuacao: int):
         return interacao_atuador_bem_sucedida
     except Exception as e:
         raise Exception("Erro ao ativar o atuador", str(e))
+
+
+def registar_ativacao_atuador_servico(uuid_atuador: str, quantidade_atuacao: int):
+    """
+    Registra uma ativaçcao de atuador bem-sucedida na base de dados.
+    """
+    try:
+        # Chamar o DAO para ativar o atuador
+        registro_ativacao_atuador = dao_ativar_atuador.registar_ativacao_atuador_base_dados(uuid_atuador, quantidade_atuacao)
+
+        return registro_ativacao_atuador
+    except Exception as e:
+        raise Exception(f"Erro ao registrar a ativação do atuador {uuid_atuador} na base de dados", str(e))

@@ -25,7 +25,7 @@ def processar_mensagem(message, topic):
         # Converter a data-hora da mensagem para o formato datetime de Python
         mensagem_dict["dataHoraAcionamentoLeitura"] = datetime.strptime(mensagem_dict["dataHoraAcionamentoLeitura"], "%Y-%m-%dT%H:%M:%S.%f%z")
 
-        logging.info("[PROC MENSAGENS - INFO] Mensagem decodificada em dicionário Python:", mensagem_dict)
+        logging.info(f"[PROC MENSAGENS - INFO] Mensagem decodificada em dicionário Python: {mensagem_dict}")
 
         # Executar validações da mensagem
         logging.info("[PROC MENSAGENS - INFO] Iniciando validações da mensagem.")
@@ -75,6 +75,6 @@ def processamento_mensagens_kafka_consumer_thread():
             logging.info(f"[PROC MENSAGENS - INFO] Recebida a mensagem do broker Kafka no tópico: {topic}, mensagem: {message.value.decode('utf-8')}")
             processar_mensagem(message.value.decode("utf-8"), topic)
     except KafkaError as e:
-        logging.info("[PROC MENSAGENS - ERRO] Kafka Error:", e)
+        logging.error("[PROC MENSAGENS - ERRO] Kafka Error:", e)
     finally:
         consumer.close()
