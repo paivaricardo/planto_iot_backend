@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 
 from mqtt_adaptador.mqtt_adaptador import MQTTAdapter
 
@@ -23,6 +24,8 @@ def enviar_sinal_atuador(uuid_atuador: str, quantidade_atuacao: int):
 
         # Publicar a mensagem de ativação do atuador no tópico, direcionada ao broker MQTT
         mqtt_adapter.publish(topico_ativacao_atuacao, json.dumps(payload_mensagem_ativacao_atuacao))
+
+        logging.info(f"[INTER. ATUADORES - INFO] Enviado sinal de ativação do atuador {uuid_atuador} com sucesso! Quantidade de atuação: {quantidade_atuacao}")
 
         return True
     except Exception as e:

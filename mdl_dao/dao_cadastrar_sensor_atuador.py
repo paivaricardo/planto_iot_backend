@@ -42,6 +42,8 @@ def cadastrar_sensor_atuador_base_dados(sensor_atuador_cadastro_completo: Sensor
         return True
 
     except SQLAlchemyError as e:
+        session.rollback()
+
         logging.error(f"[DAO - ERRO] Erro ao tentar cadastrar o sensor/atuador de UUID {str(sensor_atuador_cadastro_completo.uuid_sensor_atuador)}: {str(e)}")
         raise Exception(f"[DAO - ERRO] Erro ao tentar cadastrar o sensor/atuador de UUID {str(sensor_atuador_cadastro_completo.uuid_sensor_atuador)}", str(e))
     finally:

@@ -18,7 +18,7 @@ def persistir_leitura_sensor_atuador(mensagem_dict):
         sensor_atuador = session.query(SensorAtuador).filter(SensorAtuador.uuid_sensor_atuador == mensagem_dict['uuidSensorAtuador']).first()
 
         if not sensor_atuador:
-            print("[DAO - ERRO] Sensor não encontrado no banco de dados.")
+            logging.info("[DAO - ERRO] Sensor não encontrado no banco de dados.")
             raise ValueError("Sensor não encontrado no banco de dados.")
 
         # Criar uma nova instância do modelo LeituraAtuacao
@@ -40,7 +40,7 @@ def persistir_leitura_sensor_atuador(mensagem_dict):
     except SQLAlchemyError as e:
         session.rollback()
         # Handle the exception as needed
-        print(f"Error occurred while persisting sensor reading: {str(e)}")
+        logging.info(f"Error occurred while persisting sensor reading: {str(e)}")
 
     finally:
         session.close()

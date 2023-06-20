@@ -1,3 +1,4 @@
+import logging
 import os
 from dotenv import load_dotenv
 
@@ -46,21 +47,21 @@ class MQTTAdapter:
         return cls._instance
 
     def on_connect(self, client, userdata, flags, result_code):
-        print("[ADAPTADOR MQTT - INFO] Conectado à instância MQTT com o código de resultado ", str(result_code))
+        logging.info(f"[ADAPTADOR MQTT - INFO] Conectado à instância MQTT com o código de resultado {str(result_code)}")
 
     def on_message(self, client, userdata, msg):
-        print("[ADAPTADOR MQTT - INFO]  Recebida mensagem via MQTT no tópico {" + msg.topic + "}: " + str(msg.payload))
+        logging.info(f"[ADAPTADOR MQTT - INFO]  Recebida mensagem via MQTT no tópico {msg.topic }: {str(msg.payload)}")
 
         # Publicar a mensagem para um tópico do Apache Kafka - Relay de mensagens
         self.producer.send('planto-iot-sensores-kafka', str(msg.payload).encode('utf-8'))
         self.producer.flush()
-        print(
-            "[ADAPTADOR MQTT - INFO] Mensagem MQTT reencaminhada ao broker Kafka - Relay de mensagens - Tópico {planto-iot-sensores-kafka}")
+        logging.info(
+            f"[ADAPTADOR MQTT - INFO] Mensagem MQTT reencaminhada ao broker Kafka - Relay de mensagens - Tópico planto-iot-sensores-kafka")
 
     def publish(self, topic, payload):
         # Publish a message to the MQTT broker
         self.client.publish(topic, payload)
-        print("[ADAPTADOR MQTT - INFO] Publicada mensagem ao broker MQTT no tópico {" + topic + "}: " + payload)
+        logging.info(f"[ADAPTADOR MQTT - INFO] Publicada mensagem ao broker MQTT no tópico {topic}: {payload}")
 
     def disconnect(self):
         # Disconnect from the MQTT broker

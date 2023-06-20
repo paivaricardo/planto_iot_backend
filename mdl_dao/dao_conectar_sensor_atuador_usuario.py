@@ -31,6 +31,8 @@ def conectar_sensor_atuador_usuario_dao(autorizacao_usuario: dict):
         return True
 
     except SQLAlchemyError as e:
+        session.rollback()
+
         logging.error(f"[DAO - ERRO] Erro ao tentar conectar o usuário ao sensor/atuador de id {autorizacao_usuario.id_sensor_atuador}: {str(e)}")
         raise Exception(f"[DAO - ERRO] Erro ao tentar conectar o usuário ao sensor/atuador de id {autorizacao_usuario.id_sensor_atuador}", str(e))
     finally:

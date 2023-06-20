@@ -8,9 +8,10 @@ from model.usuario_model import Usuario
 
 
 def cadastrar_usuario_base_dados(usuario_rest_model: UsuarioRestModel):
+    # Criar uma sessão para acesso ao banco de dados
+    session = database.create_session()
+
     try:
-        # Criar uma sessão para acesso ao banco de dados
-        session = database.create_session()
 
         # Instanciar um objeto de usuário segundo o model de usuário do SQLAlchemy (Usuario)
         usuario_cadastro = Usuario(
@@ -33,6 +34,8 @@ def cadastrar_usuario_base_dados(usuario_rest_model: UsuarioRestModel):
                 "data_cadastro": usuario_cadastro.data_cadastro, "id_perfil": usuario_cadastro.id_perfil}
 
     except SQLAlchemyError as e:
+        session.rollback()
+
         logging.error(f"[DAO - ERRO] Erro ao tentar cadastrar o usuário na base de dados: {str(e)}")
         raise Exception(f"Erro ao tentar cadastrar o usuário na base de dados: {str(e)}")
 

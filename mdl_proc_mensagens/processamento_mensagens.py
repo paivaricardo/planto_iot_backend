@@ -18,7 +18,7 @@ def processar_mensagem(message, topic):
 
     try:
         # Decodificar a mensagem em json para um dicionário Python:
-        print("[PROC MENSAGENS - INFO] Mensagem recebida:", message)
+        logging.info("f[PROC MENSAGENS - INFO] Mensagem recebida: {message}")
         json_raw_message = re.sub(r"^b'|'$", "", message)
         mensagem_dict = json.loads(json_raw_message)
 
@@ -72,7 +72,7 @@ def processamento_mensagens_kafka_consumer_thread():
     # Assim que o consumidor Kafka receber uma mensagem, enviar para processamento
     try:
         for message in consumer:
-            print("[PROC MENSAGENS - INFO] Recebida a mensagem do broker Kafka no tópico:", topic, "mensagem:", message.value.decode("utf-8"))
+            logging.info(f"[PROC MENSAGENS - INFO] Recebida a mensagem do broker Kafka no tópico: {topic}, mensagem: {message.value.decode('utf-8')}")
             processar_mensagem(message.value.decode("utf-8"), topic)
     except KafkaError as e:
         logging.info("[PROC MENSAGENS - ERRO] Kafka Error:", e)
