@@ -65,12 +65,15 @@ def ativar_atuador(uuid: UUID, quantidade_atuacao: int):
             raise Exception("Erro ao enviar sinal para ativação da atuação")
 
         # Registrar a ativação do atuador no banco de dados
-        registro_ativacao_atuador = ativar_atuador_servicos.registrar_ativacao_atuador_servico(str(uuid), quantidade_atuacao)
+        registro_ativacao_atuador = ativar_atuador_servicos.registrar_ativacao_atuador_servico(str(uuid),
+                                                                                               quantidade_atuacao)
 
-        return {"status": "success", "message": "Sinal para ativação da atuação completado com sucesso", "registroAtivacaoAtuador": registro_ativacao_atuador}
+        return {"status": "success", "message": "Sinal para ativação da atuação completado com sucesso",
+                "registroAtivacaoAtuador": registro_ativacao_atuador}
     except Exception as e:
         raise HTTPException(status_code=400,
-                            detail={"status": "fail", "message": "Erro ao enviar sinal para ativação da atuação", "error": str(e)})
+                            detail={"status": "fail", "message": "Erro ao enviar sinal para ativação da atuação",
+                                    "error": str(e)})
 
 
 @app.get("/verificar-sensor-atuador/{uuid}")
@@ -296,3 +299,15 @@ def get_culturas():
 def get_areas(retrieve_status: Optional[bool] = False):
     areas = area_servicos.obter_areas_servico(retrieve_status)
     return areas
+
+
+@app.delete("/areas/{id_area}")
+def get_areas(id_area: int):
+    try:
+        area_deleted = area_servicos.deletar_area_servico(id_area)
+        return {"area_deleted": area_deleted, "message": f"Área {id_area} deletada com sucesso."}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "message": f"Erro ao tentar deletar a área {id_area} na base de dados",
+                                "error": str(e)})
