@@ -293,6 +293,6 @@ def get_culturas():
 
 
 @app.get("/areas")
-def get_areas():
-    areas = area_servicos.obter_areas_servico()
+def get_areas(retrieve_status: Optional[bool] = False):
+    areas = area_servicos.obter_areas_servico(retrieve_status)
     return areas
