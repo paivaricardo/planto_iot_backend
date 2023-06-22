@@ -9,6 +9,7 @@ from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_
     verificar_cadastrar_usuario_servicos, listar_sensores_atuadores_conectados_servicos, \
     verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos, \
     listar_ultimas_leituras_sensor_atuador_servicos
+from model.pydantic_rest_models.area_pydantic_model import AreaPydanticModel
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
 from model.pydantic_rest_models.usuario_rest_model import UsuarioRestModel
 
@@ -301,12 +302,40 @@ def get_areas(retrieve_status: Optional[bool] = False):
 
 
 @app.delete("/areas/{id_area}")
-def get_areas(id_area: int):
+def delete_area(id_area: int):
     try:
         area_deleted = area_servicos.deletar_area_servico(id_area)
-        return {"area_deleted": area_deleted, "message": f"Área {id_area} deletada com sucesso."}
+        return {"status": "success", "area_deleted": area_deleted, "message": f"Área {id_area} deletada com sucesso."}
     except Exception as e:
         raise HTTPException(status_code=400,
                             detail={
+                                "status": "fail",
                                 "message": f"Erro ao tentar deletar a área {id_area} na base de dados",
+                                "error": str(e)})
+
+
+@app.post("/areas")
+def post_area(area: AreaPydanticModel):
+    try:
+        area_created = area_servicos.criar_area_servico(area)
+        return {"status": "success", "area_created": area_created,
+                "message": f"Área {area.id_area} criada com sucesso."}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "status": "fail",
+                                "message": f"Erro ao tentar criar a área {area.id_area} na base de dados",
+                                "error": str(e)})
+
+
+@app.put("/areas/{id_area}")
+def put_area(id_area: int, area: AreaPydanticModel):
+    try:
+        area_updated = area_servicos.atualizar_area_servico(id_area, area)
+        return {"status": "success", "area_updated": area_updated, "message": f"Área {id_area} atualizada com sucesso."}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "status": "fail",
+                                "message": f"Erro ao tentar atualizar a área {id_area} na base de dados",
                                 "error": str(e)})

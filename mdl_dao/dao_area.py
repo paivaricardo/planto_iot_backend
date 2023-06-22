@@ -1,10 +1,11 @@
 import logging
 
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy import exists
 from sqlalchemy.exc import SQLAlchemyError
+
 from mdl_dao import database
 from model.area_model import Area
+from model.pydantic_rest_models.area_pydantic_model import AreaPydanticModel
 from model.sensor_atuador_model import SensorAtuador
 
 
@@ -62,6 +63,46 @@ def deletar_area(id_area):
 
         logging.error(f"[DAO - ERRO] Erro ao tentar deletar a área na base de dados: {str(e)}")
         raise Exception(f"[DAO - ERRO] Erro ao tentar deletar a área na base de dados: {str(e)}")
+
+    finally:
+        session.close()
+
+
+def criar_area(area: AreaPydanticModel):
+    session = database.create_session()
+
+    try:
+        area = Area(nome_area=area.nome_area)
+
+        session.add(area)
+        session.commit()
+
+        return area
+    except SQLAlchemyError as e:
+        session.rollback()
+
+        logging.error(f"[DAO - ERRO] Erro ao tentar criar a área na base de dados: {str(e)}")
+        raise Exception(f"[DAO - ERRO] Erro ao tentar criar a área na base de dados: {str(e)}")
+
+    finally:
+        session.close()
+
+
+def atualizar_area(id_area, area: AreaPydanticModel):
+    session = database.create_session()
+
+    try:
+        area = Area(id_area=id_area, nome_area=area.nome_area)
+
+        session.add(area)
+        session.commit()
+
+        return area
+    except SQLAlchemyError as e:
+        session.rollback()
+
+        logging.error(f"[DAO - ERRO] Erro ao tentar atualizar a área na base de dados: {str(e)}")
+        raise Exception(f"[DAO - ERRO] Erro ao tentar atualizar a área na base de dados: {str(e)}")
 
     finally:
         session.close()
