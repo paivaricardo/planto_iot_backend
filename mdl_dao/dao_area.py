@@ -1,5 +1,6 @@
 import logging
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import exists
 from sqlalchemy.exc import SQLAlchemyError
 from mdl_dao import database
@@ -15,6 +16,7 @@ def obter_todas_areas(retrieve_status: bool = False):
 
         if not retrieve_status:
             areas = session.query(Area).all()
+            return areas
         else:
             areas = session.query(Area, exists().where(SensorAtuador.id_area == Area.id_area).label('used')).all()
 
@@ -22,7 +24,17 @@ def obter_todas_areas(retrieve_status: bool = False):
                 area.deletable = not used
                 area.updatable = not used
 
-        return areas
+            area_dicts = [
+                {
+                    'id_area': area.id_area,
+                    'nome_area': area.nome_area,
+                    'updatable': not used,
+                    'deletable': not used,
+                }
+                for area, used in areas
+            ]
+
+            return area_dicts
 
     except SQLAlchemyError as e:
         logging.error(f"[DAO - ERRO] Erro ao obter todas as áreas: {str(e)}")

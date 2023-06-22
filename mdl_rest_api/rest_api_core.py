@@ -297,8 +297,7 @@ def get_culturas():
 
 @app.get("/areas")
 def get_areas(retrieve_status: Optional[bool] = False):
-    areas = area_servicos.obter_areas_servico(retrieve_status)
-    return areas
+    return area_servicos.obter_areas_servico(retrieve_status)
 
 
 @app.delete("/areas/{id_area}")
