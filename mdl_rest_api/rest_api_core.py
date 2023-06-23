@@ -10,6 +10,7 @@ from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_
     verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos, \
     listar_ultimas_leituras_sensor_atuador_servicos
 from model.pydantic_rest_models.area_pydantic_model import AreaPydanticModel
+from model.pydantic_rest_models.cultura_pydantic_model import CulturaPydanticModel
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
 from model.pydantic_rest_models.usuario_rest_model import UsuarioRestModel
 
@@ -291,9 +292,50 @@ def listar_ultimas_leituras_sensor_atuador(uuid_sensor_atuador: UUID, num_ultima
 
 
 @app.get("/culturas")
-def get_culturas():
-    culturas = cultura_servicos.obter_culturas_servico()
-    return culturas
+def get_culturas(retrieve_status: Optional[bool] = False):
+    return cultura_servicos.obter_culturas_servico(retrieve_status)
+
+
+@app.delete("/culturas/{id_cultura}")
+def delete_area(id_cultura: int):
+    try:
+        cultura_deleted = cultura_servicos.deletar_cultura_servico(id_cultura)
+        return {"status": "success", "cultura_deleted": cultura_deleted,
+                "message": f"Cultura {id_cultura} deletada com sucesso."}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "status": "fail",
+                                "message": f"Erro ao tentar deletar a cultura {id_cultura} na base de dados",
+                                "error": str(e)})
+
+
+@app.post("/culturas")
+def post_area(cultura: CulturaPydanticModel):
+    try:
+        cultura_created = cultura_servicos.criar_cultura_servico(cultura)
+        return {"status": "success", "cultura_created": cultura_created,
+                "message": f"Cultura {cultura.id_cultura} criada com sucesso."}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "status": "fail",
+                                "message": f"Erro ao tentar criar a cultura {cultura.id_cultura} na base de dados",
+                                "error": str(e)})
+
+
+@app.put("/culturas/{id_cultura}")
+def put_area(id_cultura: int, cultura: CulturaPydanticModel):
+    try:
+        cultura_updated = cultura_servicos.atualizar_cultura_servico(id_cultura, cultura)
+        return {"status": "success", "cultura_updated": cultura_updated,
+                "message": f"Cultura {id_cultura} atualizada com sucesso."}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "status": "fail",
+                                "message": f"Erro ao tentar atualizar a cultura {id_cultura} na base de dados",
+                                "error": str(e)})
 
 
 @app.get("/areas")

@@ -88,16 +88,20 @@ def criar_area(area: AreaPydanticModel):
         session.close()
 
 
-def atualizar_area(id_area, area: AreaPydanticModel):
+def atualizar_area(id_area: int, area: AreaPydanticModel):
     session = database.create_session()
 
     try:
-        area = Area(id_area=id_area, nome_area=area.nome_area)
+        area_db = session.query(Area).filter(Area.id_area == id_area).first()
 
-        session.add(area)
+        if area_db is None:
+            raise Exception(f"[DAO - ERRO] Área não encontrada com o id {id_area}")
+
+        area_db.nome_area = area.nome_area
+
         session.commit()
 
-        return area
+        return area_db
     except SQLAlchemyError as e:
         session.rollback()
 
