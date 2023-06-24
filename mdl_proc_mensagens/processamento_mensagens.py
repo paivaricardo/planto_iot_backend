@@ -18,7 +18,7 @@ def processar_mensagem(message, topic):
 
     try:
         # Decodificar a mensagem em json para um dicionário Python:
-        logging.info("f[PROC MENSAGENS - INFO] Mensagem recebida: {message}")
+        logging.info(f"[PROC MENSAGENS - INFO] Mensagem recebida: {message}")
         json_raw_message = re.sub(r"^b'|'$", "", message)
         mensagem_dict = json.loads(json_raw_message)
 
@@ -56,7 +56,7 @@ def processar_mensagem(message, topic):
             dao_mensagens_sensores_atuadores.persistir_ack_atuador(mensagem_dict)
 
     except Exception as e:
-        logging.info("[PROC MENSAGENS - ERRO] Erro no processamento da mensagem", e.args[0])
+        logging.error(f"[PROC MENSAGENS - ERRO] Erro no processamento da mensagem: {str(e)}")
         return
 
 def processamento_mensagens_kafka_consumer_thread():
