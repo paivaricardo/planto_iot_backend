@@ -159,7 +159,7 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
 
             # Acionar o módulo de interação com sensores e atuadores para enviar uma mensagem de conexão com a nova área
             mensagem_conexao_enviada = conectar_area_sensor_atuador_servicos.conectar_area_sensor_atuador_servico(
-                sensor_atuador_status['sensor_atuador_info'])
+                sensor_atuador_cadastro_completo)
 
             if sensor_atuador_status["sensor_atuador_foi_cadastrado"]:
                 return {
