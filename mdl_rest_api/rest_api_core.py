@@ -255,7 +255,7 @@ def conectar_sensor_atuador(uuid_sensor_atuador: UUID, email_usuario: str):
         if not email_usuario:
             raise Exception("Email do usuário não informado")
 
-        # Chamar camada de serviços para obter uma lista de todos os sensores e atuadores conectados a um determinado usuário
+        # Chamar camada de serviços para obter conectar um usuário a um sensor ou atuador, e retornar o status da conexão
         status_conexao_sensor_atuador = conectar_usuario_sensor_servicos.conectar_usuario_sensor_servico(
             uuid_sensor_atuador, email_usuario)
 
@@ -266,6 +266,28 @@ def conectar_sensor_atuador(uuid_sensor_atuador: UUID, email_usuario: str):
                                 "message": "Erro ao tentar conectar um usuário a um sensor na base de dados",
                                 "error": str(e)})
 
+@app.put("/desconectar-sensor-atuador/{uuid_sensor_atuador}")
+def desconectar_sensor_atuador(uuid_sensor_atuador: UUID, email_usuario: str):
+    """
+    Desconecta o usuário a a um sensor/atuador existente, contanto que ele tenha autorização para conexão a esse sensor/atuador, e ele encontra-se, atualmente, conectado ao sensor/atuador.
+
+    Recebe o uuid do sensor como route parameter. Recebe o email do usuário como query param. Se um sensor ou atuador já estiver cadastrado na base de dados, e se o usuário informado tiver autorização para conexão com esse sensor, o frontend envia sinal para a desconexão a esse sensor/atuador. Nesse caso, o backend irá setar o atributo visualizacao_ativa como FALSE na tb_autorizacao_sensor (isso equivale a desconectar o dispositivo). O sensor, então, irá aparecer na lista de sensores e atuadores conectados, aparecendo após consulta ao endpoint listar_sensores_atuadores_conectados.
+    """
+
+    try:
+        if not email_usuario:
+            raise Exception("Email do usuário não informado")
+
+        # Chamar camada de serviços para desconectar um usuário a um sensor ou atuador, e retornar o status da desconexão
+        status_desconexao_sensor_atuador = conectar_usuario_sensor_servicos.desconectar_usuario_sensor_servico(
+            uuid_sensor_atuador, email_usuario)
+
+        return status_desconexao_sensor_atuador
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "message": "Erro ao tentar desconectar um usuário a um sensor na base de dados",
+                                "error": str(e)})
 
 @app.get("/listar-ultimas-leituras-sensor-atuador/{uuid_sensor_atuador}")
 def listar_ultimas_leituras_sensor_atuador(uuid_sensor_atuador: UUID, num_ultimas_leituras: Optional[int] = 5,
@@ -389,3 +411,4 @@ def put_area(id_area: int, area: AreaPydanticModel):
                                 "status": "fail",
                                 "message": f"Erro ao tentar atualizar a área {id_area} na base de dados",
                                 "error": str(e)})
+

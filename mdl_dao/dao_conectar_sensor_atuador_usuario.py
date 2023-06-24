@@ -20,7 +20,7 @@ def conectar_sensor_atuador_usuario_dao(autorizacao_usuario: dict):
         autorizacao_usuario_database.visualizacao_ativa = True
 
         # Fazer o update com base nas novas informações de cadastro fornecidas
-        session.add(autorizacao_usuario_database)
+        # session.add(autorizacao_usuario_database)
 
         # Fazer o commit das alterações no banco de dados
         session.commit()
@@ -33,7 +33,40 @@ def conectar_sensor_atuador_usuario_dao(autorizacao_usuario: dict):
     except SQLAlchemyError as e:
         session.rollback()
 
-        logging.error(f"[DAO - ERRO] Erro ao tentar conectar o usuário ao sensor/atuador de id {autorizacao_usuario.id_sensor_atuador}: {str(e)}")
-        raise Exception(f"[DAO - ERRO] Erro ao tentar conectar o usuário ao sensor/atuador de id {autorizacao_usuario.id_sensor_atuador}", str(e))
+        logging.error(f"[DAO - ERRO] Erro ao tentar conectar o usuário ao sensor/atuador de id {autorizacao_usuario['id_sensor_atuador']}: {str(e)}")
+        raise Exception(f"[DAO - ERRO] Erro ao tentar conectar o usuário ao sensor/atuador de id {autorizacao_usuario['id_sensor_atuador']}", str(e))
+    finally:
+        session.close()
+
+
+def desconectar_sensor_atuador_usuario_dao(autorizacao_usuario: dict):
+    # Criar uma sessão para acesso ao banco de dados
+    session = database.create_session()
+
+    try:
+
+        # Buscar se há uma correspondência do id da autorizacao para uma autorizacao na base de dados
+        autorizacao_usuario_database = session.query(AutorizacaoSensor).filter(
+            AutorizacaoSensor.id_autorizacao_sensor == autorizacao_usuario["id_autorizacao_sensor"]).first()
+
+        # Atualizar a autorização, para constar visualização ativa como False (isso representa que o usuário está desconectando daquele sensor)
+        autorizacao_usuario_database.visualizacao_ativa = False
+
+        # Fazer o update com base nas novas informações de cadastro fornecidas
+        # session.add(autorizacao_usuario_database)
+
+        # Fazer o commit das alterações no banco de dados
+        session.commit()
+
+        logging.info(
+            f"[DAO - INFO] Sensor ou atuador de id {autorizacao_usuario['id_sensor_atuador']} desconectado do usuário de id {autorizacao_usuario['usuario'].id_usuario} com sucesso")
+
+        return True
+
+    except SQLAlchemyError as e:
+        session.rollback()
+
+        logging.error(f"[DAO - ERRO] Erro ao tentar desconectar o usuário do sensor/atuador de id {autorizacao_usuario['id_sensor_atuador']}: {str(e)}")
+        raise Exception(f"[DAO - ERRO] Erro ao tentar desconectar o usuário do sensor/atuador de id {autorizacao_usuario['id_sensor_atuador']}", str(e))
     finally:
         session.close()
