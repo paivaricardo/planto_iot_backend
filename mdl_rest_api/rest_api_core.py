@@ -8,7 +8,7 @@ from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_
     ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos, \
     verificar_cadastrar_usuario_servicos, listar_sensores_atuadores_conectados_servicos, \
     verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos, \
-    listar_ultimas_leituras_sensor_atuador_servicos
+    listar_ultimas_leituras_sensor_atuador_servicos, conectar_area_sensor_atuador_servicos
 from model.pydantic_rest_models.area_pydantic_model import AreaPydanticModel
 from model.pydantic_rest_models.cultura_pydantic_model import CulturaPydanticModel
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
@@ -157,14 +157,22 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
                 sensor_atuador_cadastro_completo.uuid_sensor_atuador,
                 sensor_atuador_cadastro_completo.email_usuario_cadastrante)
 
+            # Acionar o módulo de interação com sensores e atuadores para enviar uma mensagem de conexão com a nova área
+            mensagem_conexao_enviada = conectar_area_sensor_atuador_servicos.conectar_area_sensor_atuador_servico(
+                sensor_atuador_status['sensor_atuador_info'])
+
             if sensor_atuador_status["sensor_atuador_foi_cadastrado"]:
                 return {
                     "message": f"Cadastro do sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador} atualizado com sucesso.",
-                    "conexao_usuario_sensor": sensor_atuador_conectado}
+                    "conexao_usuario_sensor": sensor_atuador_conectado,
+                    "mensagem_conexao_enviada": mensagem_conexao_enviada
+                }
             else:
                 return {
                     "message": f"Sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador} cadastrado com sucesso.",
-                    "conexao_usuario_sensor": sensor_atuador_conectado}
+                    "conexao_usuario_sensor": sensor_atuador_conectado,
+                    "mensagem_conexao_enviada": mensagem_conexao_enviada
+                }
         else:
             return {
                 "message": f"Erro ao cadastrar o sensor ou atuador de UUID {sensor_atuador_cadastro_completo.uuid_sensor_atuador}"}

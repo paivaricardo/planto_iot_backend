@@ -34,7 +34,7 @@ class MQTTAdapter:
             # Conectar ao broker MQTT
             cls._instance.client.connect(cls._instance.mqtt_host, int(cls._instance.mqtt_port), 60)
 
-            # Inscrever-se nos tópicos desejados
+            # Inscrever-se nos tópicos para leitura de informações dos sensores - indicado por planto-iot-sensores/identificador_fazenda/identificacao_area/S
             cls._instance.client.subscribe("planto-iot-sensores/+/+/S")
 
             # Create Kafka producer instance
