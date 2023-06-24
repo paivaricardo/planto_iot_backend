@@ -15,7 +15,7 @@ def enviar_informacao_conexao_area_sensor_atuador(sensor_atuador_query_model: Se
 
         payload_mensagem_conexao_area = {
             "uuidSensorAtuador": sensor_atuador_query_model.uuid_sensor_atuador,
-            "dataHoraConexaoArea": datetime.datetime.now(),
+            "dataHoraConexaoArea": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             "tipoSinal": 60100,
             "idAreaConectada": sensor_atuador_query_model.area.id_area,
         }
