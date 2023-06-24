@@ -14,7 +14,7 @@ def enviar_informacao_conexao_area_sensor_atuador(sensor_atuador_cadastro_comple
         topico_info_conexao_area = f"planto-iot-sensores/{sensor_atuador_cadastro_completo.uuid_sensor_atuador}"
 
         payload_mensagem_conexao_area = {
-            "uuidSensorAtuador": sensor_atuador_cadastro_completo.uuid_sensor_atuador,
+            "uuidSensorAtuador": str(sensor_atuador_cadastro_completo.uuid_sensor_atuador),
             "dataHoraConexaoArea": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             "tipoSinal": 60100,
             "idAreaConectada": sensor_atuador_cadastro_completo.id_area,
