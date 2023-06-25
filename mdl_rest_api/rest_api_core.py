@@ -10,6 +10,7 @@ from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_
     verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos, \
     listar_ultimas_leituras_sensor_atuador_servicos, conectar_area_sensor_atuador_servicos, autorizacao_servicos
 from model.pydantic_rest_models.area_pydantic_model import AreaPydanticModel
+from model.pydantic_rest_models.autorizacao_pydantic_model import AutorizacaoPydanticModel
 from model.pydantic_rest_models.cultura_pydantic_model import CulturaPydanticModel
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
 from model.pydantic_rest_models.usuario_rest_model import UsuarioRestModel
@@ -416,11 +417,23 @@ def put_area(id_area: int, area: AreaPydanticModel):
 
 
 @app.post("/autorizacoes")
-def criar_autorizacao(id_sensor_atuador: int, id_usuario: int, id_perfil_autorizacao: int, conectar: Optional[bool] = False):
+def criar_autorizacao(autorizacao_pydantic_model: AutorizacaoPydanticModel):
     try:
-        autorizacao_created = autorizacao_servicos.criar_autorizacao_servico(id_sensor_atuador, id_usuario,
-                                                                             id_perfil_autorizacao, conectar)
-        return {"status": "success", "autorizacao_created": autorizacao_created,
+        if autorizacao_pydantic_model.conectar is None:
+            autorizacao_pydantic_model.conectar = False
+
+        autorizacao_created = autorizacao_servicos.criar_autorizacao_servico(autorizacao_pydantic_model)
+
+        # Se o usuário não foi localizado na base de dados, retorna o status 1
+        if autorizacao_created == 1:
+            return {"status": 1, "autorizacao_created": None,
+                    "message": f"O usuário com o e-mail {email_usuario} não foi localizado na base de dados."}
+
+        # Se o usuário já possui uma autorização para o sensor/atuador, retorna o status 2
+        # TODO - Verificar se o usuário já possui uma autorização para o sensor/atuador
+
+        # Se a autoriazação foi criada com sucesso, retorna o status 0
+        return {"status": 0, "autorizacao_created": autorizacao_created,
                 "message": f"Autorização {autorizacao_created.id_autorizacao} criada com sucesso."}
     except Exception as e:
         raise HTTPException(status_code=400,
