@@ -102,7 +102,7 @@ def desconectar_usuario_sensor_servico(uuid_sensor_atuador: UUID, email_usuario:
 
         # Verificar se o usuário já está desconectado do sensor ou atuador. Se sim, não será feita a desconexão e será devolvido o código correspondente (vide acima)
         if not autorizacoes_usuario[0]["visualizacao_ativa"]:
-            return {"cod_status_desconexao": 2, "mensagem": "Usuário já está desconectado ao sensor ou atuador."}
+            return {"cod_status_desconexao": 2, "mensagem": "Usuário já está desconectado do sensor ou atuador."}
 
         # Se o usuário está conectado ao sensor ou atuador, desconectá-lo
         if autorizacoes_usuario[0]["visualizacao_ativa"]:

@@ -8,7 +8,7 @@ from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_
     ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos, \
     verificar_cadastrar_usuario_servicos, listar_sensores_atuadores_conectados_servicos, \
     verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos, \
-    listar_ultimas_leituras_sensor_atuador_servicos, conectar_area_sensor_atuador_servicos
+    listar_ultimas_leituras_sensor_atuador_servicos, conectar_area_sensor_atuador_servicos, autorizacao_servicos
 from model.pydantic_rest_models.area_pydantic_model import AreaPydanticModel
 from model.pydantic_rest_models.cultura_pydantic_model import CulturaPydanticModel
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
@@ -266,6 +266,7 @@ def conectar_sensor_atuador(uuid_sensor_atuador: UUID, email_usuario: str):
                                 "message": "Erro ao tentar conectar um usuário a um sensor na base de dados",
                                 "error": str(e)})
 
+
 @app.put("/desconectar-sensor-atuador/{uuid_sensor_atuador}")
 def desconectar_sensor_atuador(uuid_sensor_atuador: UUID, email_usuario: str):
     """
@@ -288,6 +289,7 @@ def desconectar_sensor_atuador(uuid_sensor_atuador: UUID, email_usuario: str):
                             detail={
                                 "message": "Erro ao tentar desconectar um usuário a um sensor na base de dados",
                                 "error": str(e)})
+
 
 @app.get("/listar-ultimas-leituras-sensor-atuador/{uuid_sensor_atuador}")
 def listar_ultimas_leituras_sensor_atuador(uuid_sensor_atuador: UUID, num_ultimas_leituras: Optional[int] = 5,
@@ -412,3 +414,31 @@ def put_area(id_area: int, area: AreaPydanticModel):
                                 "message": f"Erro ao tentar atualizar a área {id_area} na base de dados",
                                 "error": str(e)})
 
+
+@app.post("/autorizacoes")
+def criar_autorizacao(id_sensor_atuador: int, email_usuario: str, id_perfil_autorizacao: int, conectar: Optional[bool] = False):
+    try:
+        autorizacao_created = autorizacao_servicos.criar_autorizacao_servico(id_sensor_atuador, email_usuario,
+                                                                             id_perfil_autorizacao, conectar)
+        return {"status": "success", "autorizacao_created": autorizacao_created,
+                "message": f"Autorização {autorizacao_created.id_autorizacao} criada com sucesso."}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "status": "fail",
+                                "message": f"Erro ao tentar criar a autorização na base de dados",
+                                "error": str(e)})
+
+
+@app.delete("/autorizacoes/{id_autorizacao}")
+def delete_autorizacao(id_autorizacao: int):
+    try:
+        autorizacao_deleted = autorizacao_servicos.deletar_autorizacao_servico(id_autorizacao)
+        return {"status": "success", "autorizacao_deleted": autorizacao_deleted,
+                "message": f"Autorização {id_autorizacao} deletada com sucesso."}
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "status": "fail",
+                                "message": f"Erro ao tentar deletar a autorização {id_autorizacao} na base de dados",
+                                "error": str(e)})
