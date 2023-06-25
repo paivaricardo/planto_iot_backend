@@ -427,7 +427,7 @@ def criar_autorizacao(autorizacao_pydantic_model: AutorizacaoPydanticModel):
         # Se o usuário não foi localizado na base de dados, retorna o status 1
         if autorizacao_created == 1:
             return {"status": 1, "autorizacao_created": None,
-                    "message": f"O usuário com o e-mail {email_usuario} não foi localizado na base de dados."}
+                    "message": f"O usuário com o e-mail {autorizacao_pydantic_model.email_usuario} não foi localizado na base de dados."}
 
         # Se o usuário já possui uma autorização para o sensor/atuador, retorna o status 2
         # TODO - Verificar se o usuário já possui uma autorização para o sensor/atuador
