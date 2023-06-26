@@ -10,7 +10,14 @@ def obter_tipos_sensores_bd():
     session = database.create_session()
 
     try:
-       return session.query(TipoSensor.all()).all()
+        sensores = session.query(TipoSensor).all()
+
+        sensores_dicts = [{
+            'id_tipo_sensor': sensor.id_tipo_sensor,
+            'nome_tipo_sensor': sensor.nome_tipo_sensor,
+        } for sensor in sensores]
+
+        return sensores_dicts
 
     except SQLAlchemyError as e:
         logging.error(f"[DAO - ERRO] Erro ao obter os tipos de sensores: {str(e)}")
