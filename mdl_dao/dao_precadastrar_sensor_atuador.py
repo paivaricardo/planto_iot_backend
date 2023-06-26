@@ -1,12 +1,12 @@
 import logging
 import uuid
-from datetime import datetime
+from typing import Optional
 
 from sqlalchemy.exc import SQLAlchemyError
 
+from mdl_dao import database
 from model.sensor_atuador_model import SensorAtuador
 from model.tipo_sensor_model import TipoSensor
-from mdl_dao import database
 
 
 def obter_lista_tipos_sensores_atuadores():
@@ -28,7 +28,8 @@ def obter_lista_tipos_sensores_atuadores():
     finally:
         session.close()
 
-def precadastrar_sensor_atuador_base_dados(id_tipo_sensor):
+
+def precadastrar_sensor_atuador_base_dados(id_tipo_sensor, uuid_selecionado: Optional[uuid.UUID] = None):
     # Criar uma sessão para acesso ao banco de dados
     session = database.create_session()
 
@@ -36,7 +37,7 @@ def precadastrar_sensor_atuador_base_dados(id_tipo_sensor):
 
         # Instanciar um model de sensor e atuaador, gerando um UUID na hora. A data será a corrente, gerada pelo próprio banco de dados
         sensor_atuador = SensorAtuador(
-            uuid_sensor_atuador=str(uuid.uuid4()),
+            uuid_sensor_atuador=uuid_selecionado if str(uuid_selecionado) is not None else str(uuid.uuid4()),
             id_tipo_sensor=id_tipo_sensor
         )
 
@@ -44,7 +45,8 @@ def precadastrar_sensor_atuador_base_dados(id_tipo_sensor):
         session.add(sensor_atuador)
         session.commit()
 
-        logging.info(f"[DAO - INFO] Sensor ou atuador precadastrado com sucesso. Gerado o uuid: {str(sensor_atuador.uuid_sensor_atuador)}")
+        logging.info(
+            f"[DAO - INFO] Sensor ou atuador precadastrado com sucesso. Gerado o uuid: {str(sensor_atuador.uuid_sensor_atuador)}")
 
         return sensor_atuador.uuid_sensor_atuador
 

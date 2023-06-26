@@ -8,7 +8,8 @@ from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_
     ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos, \
     verificar_cadastrar_usuario_servicos, listar_sensores_atuadores_conectados_servicos, \
     verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos, \
-    listar_ultimas_leituras_sensor_atuador_servicos, conectar_area_sensor_atuador_servicos, autorizacao_servicos
+    listar_ultimas_leituras_sensor_atuador_servicos, conectar_area_sensor_atuador_servicos, autorizacao_servicos, \
+    tipo_sensor_servicos
 from model.pydantic_rest_models.area_pydantic_model import AreaPydanticModel
 from model.pydantic_rest_models.autorizacao_pydantic_model import AutorizacaoPydanticModel
 from model.pydantic_rest_models.cultura_pydantic_model import CulturaPydanticModel
@@ -27,7 +28,7 @@ def health_check():
 
 
 @app.post("/pre-cadastrar-sensor-atuador")
-def precadastrar_sensor_ou_atuador(id_tipo_sensor: int):
+def precadastrar_sensor_ou_atuador(id_tipo_sensor: int, email_usuario: str, uuid_selecionado: Optional[UUID] = None):
     """
     Precadastra um sensor ou um atuador na base de dados.
 
@@ -36,7 +37,10 @@ def precadastrar_sensor_ou_atuador(id_tipo_sensor: int):
     try:
 
         # Chamar a chamada de serviços para precadastrar um sensor ou um atuador
-        uuid_gerado = precadastrar_sensor_atuador_servicos.precadastrar_sensor_atuador_servico(id_tipo_sensor)
+        uuid_gerado = precadastrar_sensor_atuador_servicos.precadastrar_sensor_atuador_servico(id_tipo_sensor, uuid_selecionado)
+
+        # Gerar a autorização de acesso para o usuário cujo e-mail foi passado via queryParam
+        # TODO - Implementar a geração de autorização de acesso para o usuário
 
         return Response(content={"status": "pre-cadastrado", "uuid": uuid_gerado}, status_code=201)
     except Exception as e:
@@ -455,3 +459,7 @@ def delete_autorizacao(id_autorizacao: int):
                                 "status": "fail",
                                 "message": f"Erro ao tentar deletar a autorização {id_autorizacao} na base de dados",
                                 "error": str(e)})
+
+@app.get("/tipos-sensores")
+def get_tipos_sensores():
+    return tipo_sensor_servicos.obter_tipos_sensores_servico()
