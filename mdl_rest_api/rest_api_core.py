@@ -434,7 +434,7 @@ def criar_autorizacao(autorizacao_pydantic_model: AutorizacaoPydanticModel):
 
         # Se a autoriazação foi criada com sucesso, retorna o status 0
         return {"status": 0, "autorizacao_created": autorizacao_created,
-                "message": f"Autorização {autorizacao_created.id_autorizacao} criada com sucesso."}
+                "message": f"Autorização {autorizacao_created.id_autorizacao_sensor} criada com sucesso."}
     except Exception as e:
         raise HTTPException(status_code=400,
                             detail={
