@@ -48,6 +48,8 @@ def criar_autorizacao_bd(autorizacao_pydantic_model: AutorizacaoPydanticModel, i
         # Comitar a sessão
         session.commit()
 
+        return autorizacao
+
     except SQLAlchemyError as e:
         session.rollback()
 
