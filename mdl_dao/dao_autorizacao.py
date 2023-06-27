@@ -39,8 +39,10 @@ def criar_autorizacao_bd(autorizacao_pydantic_model: AutorizacaoPydanticModel, i
 
     try:
         # Instanciar um objeto de autorização
-        autorizacao = AutorizacaoSensor(id_sensor_atuador=autorizacao_pydantic_model.id_sensor_atuador, id_usuario=id_usuario,
-                                        id_perfil_autorizacao=autorizacao_pydantic_model.id_perfil_autorizacao, visualizacao_ativa=autorizacao_pydantic_model.conectar)
+        autorizacao = AutorizacaoSensor(id_sensor_atuador=autorizacao_pydantic_model.id_sensor_atuador,
+                                        id_usuario=id_usuario,
+                                        id_perfil_autorizacao=autorizacao_pydantic_model.id_perfil_autorizacao,
+                                        visualizacao_ativa=autorizacao_pydantic_model.conectar)
 
         # Adicionar o objeto de autorização à sessão
         session.add(autorizacao)
@@ -48,7 +50,15 @@ def criar_autorizacao_bd(autorizacao_pydantic_model: AutorizacaoPydanticModel, i
         # Comitar a sessão
         session.commit()
 
-        return autorizacao
+        autorizacao_dict = {
+            "id_autorizacao_sensor": autorizacao.id_autorizacao_sensor,
+            "id_sensor_atuador": autorizacao.id_sensor_atuador,
+            "id_usuario": autorizacao.id_usuario,
+            "id_perfil_autorizacao": autorizacao.id_perfil_autorizacao,
+            "visualizacao_ativa": autorizacao.visualizacao_ativa,
+        }
+
+        return autorizacao_dict
 
     except SQLAlchemyError as e:
         session.rollback()

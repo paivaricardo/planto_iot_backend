@@ -27,7 +27,7 @@ def health_check():
     return {"status": "ok"}
 
 
-@app.post("/pre-cadastrar-sensor-atuador")
+@app.post("/pre-cadastrar-sensor-atuador", status_code=201)
 def precadastrar_sensor_ou_atuador(id_tipo_sensor: int, email_usuario: str, uuid_selecionado: Optional[UUID] = None):
     """
     Precadastra um sensor ou um atuador na base de dados.
@@ -37,12 +37,21 @@ def precadastrar_sensor_ou_atuador(id_tipo_sensor: int, email_usuario: str, uuid
     try:
 
         # Chamar a chamada de serviços para precadastrar um sensor ou um atuador
-        uuid_gerado = precadastrar_sensor_atuador_servicos.precadastrar_sensor_atuador_servico(id_tipo_sensor, uuid_selecionado)
+        precadastro_status_dict = precadastrar_sensor_atuador_servicos.precadastrar_sensor_atuador_servico(id_tipo_sensor, uuid_selecionado)
 
-        # Gerar a autorização de acesso para o usuário cujo e-mail foi passado via queryParam
-        # TODO - Implementar a geração de autorização de acesso para o usuário
+        if precadastro_status_dict["status"] == 1:
+            return precadastro_status_dict
 
-        return Response(content={"status": "pre-cadastrado", "uuid": uuid_gerado}, status_code=201)
+        autorizacao_pydantic_model = AutorizacaoPydanticModel(id_sensor_atuador=precadastro_status_dict["sensor_atuador_precadastrado_info"]["id_sensor_atuador"],
+                                                              email_usuario=email_usuario,
+                                                              id_perfil_autorizacao=1,
+                                                              conectar=False)
+
+        autorizacao_criada = autorizacao_servicos.criar_autorizacao_servico(autorizacao_pydantic_model)
+
+        precadastro_status_dict["autorizacao_criada"] = autorizacao_criada
+
+        return precadastro_status_dict
     except Exception as e:
         raise HTTPException(status_code=400,
                             detail={"message": "Erro ao precadastrar o sensor ou atuador", "error": str(e)})
