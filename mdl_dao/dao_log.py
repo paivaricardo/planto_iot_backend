@@ -22,7 +22,7 @@ def registrar_login_usuario_log_bd(id_usuario):
             "id_usuario": usuario.id_usuario,
             "nome_usuario": usuario.nome_usuario,
             "email_usuario": usuario.email_usuario,
-            "data_hora_login": datetime.datetime.now(),
+            "data_hora_login": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             "mensagem": f"O usuário {usuario.nome_usuario} - email {usuario.email_usuario} realizou login no sistema às {datetime.datetime.now()}"
         }
 
