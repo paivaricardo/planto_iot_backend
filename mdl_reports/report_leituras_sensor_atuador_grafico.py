@@ -1,10 +1,8 @@
 import base64
+from io import BytesIO
 
 import matplotlib.pyplot as plt
-from io import BytesIO
-from reportlab.pdfgen import canvas
-from fastapi.responses import FileResponse
-from datetime import datetime
+
 
 def gerar_relatorio_leitura_sensor(informacoes_sensor, leituras_sensor_dicts):
     try:

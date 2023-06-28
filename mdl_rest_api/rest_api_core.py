@@ -481,7 +481,7 @@ def delete_autorizacao(id_autorizacao: int):
 def get_tipos_sensores():
     return tipo_sensor_servicos.obter_tipos_sensores_servico()
 
-@app.get("/gerar-relatorio-leitura-sensor")
+@app.get("/gerar-imagem-relatorio-leitura-sensor")
 def gerar_relatorio_leitura_sensores(uuid_sensor: UUID, data_inicial_timestamp: str, data_final_timestamp: str, filtragem_tipo_sinal: Optional[int] = 10000):
     try:
         if filtragem_tipo_sinal is None:
@@ -512,4 +512,37 @@ def gerar_relatorio_leitura_sensores(uuid_sensor: UUID, data_inicial_timestamp: 
                             detail={
                                 "status": "fail",
                                 "message": f"Erro ao gerar relatório de leitura de sensores",
+                                "error": str(e)})
+
+@app.get("/obter-leituras-relatorio-sensor")
+def obter_leituras_relatorio_sensor(uuid_sensor: UUID, data_inicial_timestamp: str, data_final_timestamp: str, filtragem_tipo_sinal: Optional[int] = 10000):
+    try:
+        if filtragem_tipo_sinal is None:
+            filtragem_tipo_sinal = 10000
+
+        # Parse the begin and end dates
+        begin_date_timestamp = datetime.strptime(data_inicial_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
+        end_date_timestamp = datetime.strptime(data_final_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
+
+        if begin_date_timestamp > end_date_timestamp:
+            raise Exception("A data-hora inicial deve ser menor ou igual a data-hora final")
+        elif end_date_timestamp > datetime.now(tz=timezone.utc):
+            raise Exception("A data-hora final deve ser menor ou igual a data-hora atual")
+        elif begin_date_timestamp < datetime(2023, 6, 1, 0, 0, 0, 0, tzinfo=timezone.utc):
+            raise Exception("A data-hora inicial deve ser maior ou igual à data de 01/06/2023")
+
+        leituras_sensor = relatorio_sensores_atuadores_servicos.obter_relatorio_leituras_sensor_servico(uuid_sensor, begin_date_timestamp, end_date_timestamp, filtragem_tipo_sinal)
+
+        if leituras_sensor is None:
+            return {"status": "no_reports", "leituras_sensor": None,
+                    "message": f"Não há leituras no período informado, para montagem de um relatório."}
+
+        return {"status": "success", "leituras_sensor": leituras_sensor,
+                "message": f"Relatório de leitura de sensores gerado com sucesso."}
+
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "status": "fail",
+                                "message": f"Erro ao obter as leituras do sensor para relatório.",
                                 "error": str(e)})
