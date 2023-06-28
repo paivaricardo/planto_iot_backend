@@ -10,6 +10,7 @@ import re
 from mdl_validador_mensagens import validacao_mensagens
 from mdl_dao import dao_mensagens_sensores_atuadores
 
+
 def processar_mensagem(message, topic):
     logging.info("[PROC MENSAGENS - INFO] Iniciado o processamento da mensagem.")
 
@@ -23,7 +24,8 @@ def processar_mensagem(message, topic):
         mensagem_dict = json.loads(json_raw_message)
 
         # Converter a data-hora da mensagem para o formato datetime de Python
-        mensagem_dict["dataHoraAcionamentoLeitura"] = datetime.strptime(mensagem_dict["dataHoraAcionamentoLeitura"], "%Y-%m-%dT%H:%M:%S.%f%z")
+        mensagem_dict["dataHoraAcionamentoLeitura"] = datetime.strptime(mensagem_dict["dataHoraAcionamentoLeitura"],
+                                                                        "%Y-%m-%dT%H:%M:%S.%f%z")
 
         logging.info(f"[PROC MENSAGENS - INFO] Mensagem decodificada em dicionário Python: {mensagem_dict}")
 
@@ -48,16 +50,19 @@ def processar_mensagem(message, topic):
 
         # De acordo com o tipo de sinal, chamar diferentes funções do DAO para persistir na base de dados
         if mensagem_dict["tipoSinal"] == 10000:
-            logging.info("[PROC MENSAGENS - INFO] Redirecionando a mensagem de LEITURA DE SENSORES para o módulo de persistência do DAO.")
+            logging.info(
+                "[PROC MENSAGENS - INFO] Redirecionando a mensagem de LEITURA DE SENSORES para o módulo de persistência do DAO.")
             dao_mensagens_sensores_atuadores.persistir_leitura_sensor_atuador(mensagem_dict)
 
         if mensagem_dict["tipoSinal"] == 50001:
-            logging.info("[PROC MENSAGENS - INFO] Redirecionando a mensagem de ACK DE ACIONAMENTO DE ATUADORES para o módulo de persistência do DAO.")
+            logging.info(
+                "[PROC MENSAGENS - INFO] Redirecionando a mensagem de ACK DE ACIONAMENTO DE ATUADORES para o módulo de persistência do DAO.")
             dao_mensagens_sensores_atuadores.persistir_ack_atuador(mensagem_dict)
 
     except Exception as e:
         logging.error(f"[PROC MENSAGENS - ERRO] Erro no processamento da mensagem: {str(e)}")
         return
+
 
 def processamento_mensagens_kafka_consumer_thread():
     logging.info("[PROC MENSAGENS - INFO] Iniciado o módulo de processamento de mensagens do Planto-IoT Backend.")
@@ -72,7 +77,8 @@ def processamento_mensagens_kafka_consumer_thread():
     # Assim que o consumidor Kafka receber uma mensagem, enviar para processamento
     try:
         for message in consumer:
-            logging.info(f"[PROC MENSAGENS - INFO] Recebida a mensagem do broker Kafka no tópico: {topic}, mensagem: {message.value.decode('utf-8')}")
+            logging.info(
+                f"[PROC MENSAGENS - INFO] Recebida a mensagem do broker Kafka no tópico: {topic}, mensagem: {message.value.decode('utf-8')}")
             processar_mensagem(message.value.decode("utf-8"), topic)
     except KafkaError as e:
         logging.error("[PROC MENSAGENS - ERRO] Kafka Error:", e)

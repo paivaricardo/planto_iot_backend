@@ -9,13 +9,14 @@ from model.leitura_atuacao_model import LeituraAtuacao
 
 
 def persistir_leitura_sensor_atuador(mensagem_dict):
+    # Criar uma sessão para acesso ao banco de dados
+    session = database.create_session()
+
     try:
 
-        # Criar uma sessão para acesso ao banco de dados
-        session = database.create_session()
-
         # Buscar id do sensor atuador no banco de dados, gravar na variável sensor_atuador
-        sensor_atuador = session.query(SensorAtuador).filter(SensorAtuador.uuid_sensor_atuador == mensagem_dict['uuidSensorAtuador']).first()
+        sensor_atuador = session.query(SensorAtuador).filter(
+            SensorAtuador.uuid_sensor_atuador == mensagem_dict['uuidSensorAtuador']).first()
 
         if not sensor_atuador:
             logging.info("[DAO - ERRO] Sensor não encontrado no banco de dados.")
@@ -40,7 +41,7 @@ def persistir_leitura_sensor_atuador(mensagem_dict):
     except SQLAlchemyError as e:
         session.rollback()
         # Handle the exception as needed
-        logging.info(f"Error occurred while persisting sensor reading: {str(e)}")
+        logging.error(f"[DAO - ERRO] Error occurred while persisting sensor reading: {str(e)}")
 
     finally:
         session.close()
@@ -55,7 +56,8 @@ def persistir_ack_atuador(mensagem_dict):
     try:
 
         # Buscar id do sensor atuador no banco de dados, gravar na variável sensor_atuador
-        sensor_atuador = session.query(SensorAtuador).filter(SensorAtuador.uuid_sensor_atuador == mensagem_dict['uuidSensorAtuador']).first()
+        sensor_atuador = session.query(SensorAtuador).filter(
+            SensorAtuador.uuid_sensor_atuador == mensagem_dict['uuidSensorAtuador']).first()
 
         # Criar uma nova instância do modelo LeituraAtuacao
         leitura_atuacao = LeituraAtuacao(
@@ -69,7 +71,8 @@ def persistir_ack_atuador(mensagem_dict):
         session.add(leitura_atuacao)
         session.commit()
 
-        logging.info(f"[DAO - INFO] Ack de acionamento do atuador persistido com sucesso. Gerado o id: {leitura_atuacao.id_leitura_atuacao}")
+        logging.info(
+            f"[DAO - INFO] Ack de acionamento do atuador persistido com sucesso. Gerado o id: {leitura_atuacao.id_leitura_atuacao}")
 
         return leitura_atuacao.id_leitura_atuacao  # Return the generated ID if needed
 

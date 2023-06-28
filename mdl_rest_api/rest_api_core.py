@@ -9,7 +9,7 @@ from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_
     verificar_cadastrar_usuario_servicos, listar_sensores_atuadores_conectados_servicos, \
     verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos, \
     listar_ultimas_leituras_sensor_atuador_servicos, conectar_area_sensor_atuador_servicos, autorizacao_servicos, \
-    tipo_sensor_servicos
+    tipo_sensor_servicos, log_servicos
 from model.pydantic_rest_models.area_pydantic_model import AreaPydanticModel
 from model.pydantic_rest_models.autorizacao_pydantic_model import AutorizacaoPydanticModel
 from model.pydantic_rest_models.cultura_pydantic_model import CulturaPydanticModel
@@ -37,15 +37,17 @@ def precadastrar_sensor_ou_atuador(id_tipo_sensor: int, email_usuario: str, uuid
     try:
 
         # Chamar a chamada de serviços para precadastrar um sensor ou um atuador
-        precadastro_status_dict = precadastrar_sensor_atuador_servicos.precadastrar_sensor_atuador_servico(id_tipo_sensor, uuid_selecionado)
+        precadastro_status_dict = precadastrar_sensor_atuador_servicos.precadastrar_sensor_atuador_servico(
+            id_tipo_sensor, uuid_selecionado)
 
         if precadastro_status_dict["status"] == 1:
             return precadastro_status_dict
 
-        autorizacao_pydantic_model = AutorizacaoPydanticModel(id_sensor_atuador=precadastro_status_dict["sensor_atuador_precadastrado_info"]["id_sensor_atuador"],
-                                                              email_usuario=email_usuario,
-                                                              id_perfil_autorizacao=1,
-                                                              conectar=False)
+        autorizacao_pydantic_model = AutorizacaoPydanticModel(
+            id_sensor_atuador=precadastro_status_dict["sensor_atuador_precadastrado_info"]["id_sensor_atuador"],
+            email_usuario=email_usuario,
+            id_perfil_autorizacao=1,
+            conectar=False)
 
         autorizacao_criada = autorizacao_servicos.criar_autorizacao_servico(autorizacao_pydantic_model)
 
@@ -217,6 +219,9 @@ def verificar_cadastrar_usuario(usuario_rest_model: UsuarioRestModel):
 
         # Chamar camada de serviços para verificar se o sensor ou atuador realmente existe na base de dados
         usuario_status = verificar_cadastrar_usuario_servicos.verificar_cadastrar_usuario_servico(usuario_rest_model)
+
+        # Registrar o login do usuário no log
+        log_servicos.registrar_login_usuario_log_servico(usuario_rest_model.email_usuario)
 
         if usuario_status["usuario_ja_existe_bd"]:
             return {
@@ -468,6 +473,7 @@ def delete_autorizacao(id_autorizacao: int):
                                 "status": "fail",
                                 "message": f"Erro ao tentar deletar a autorização {id_autorizacao} na base de dados",
                                 "error": str(e)})
+
 
 @app.get("/tipos-sensores")
 def get_tipos_sensores():

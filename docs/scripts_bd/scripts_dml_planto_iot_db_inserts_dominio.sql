@@ -51,6 +51,13 @@ INSERT INTO tb_perfil_autorizacao
 VALUES ('Administrador'),
        ('Usuário');
 
-
+-- ************************************** Tabela: tb_log_event_type
+INSERT INTO tb_log_event_type
+    (nome_log_event_type)
+VALUES ('USER_LOGIN'),
+       ('PRE_REGISTER_SENSOR'),
+       ('UPDATE_SENSOR_REGISTER'),
+       ('CONNECT_SENSOR'),
+       ('DISCONNECT_SENSOR');
 
 

@@ -13,8 +13,6 @@ class MQTTAdapter:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
 
-            # Variáveis de ambiente
-
             # Carregar as variáveis de ambiente do arquivo .env
             load_dotenv()
 

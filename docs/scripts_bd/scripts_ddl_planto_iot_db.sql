@@ -161,6 +161,26 @@ CREATE TABLE tb_perfil_autorizacao
 );
 
 
+-- ************************************** tb_log
+CREATE TABLE tb_log
+(
+   id_log int NOT NULL GENERATED ALWAYS AS IDENTITY,
+   data_hora_log timestamp WITH time ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   json_log TEXT NULL,
+   id_usuario int NULL,
+    id_log_event_type int NOT NULL,
+   CONSTRAINT PK_tb_log PRIMARY KEY (id_log)
+);
+
+-- ************************************** tb_log_event_type
+CREATE TABLE tb_log_event_type
+(
+   id_log_event_type int NOT NULL GENERATED ALWAYS AS IDENTITY,
+   nome_log_event_type varchar(255) NOT NULL,
+   CONSTRAINT PK_tb_log_event_type PRIMARY KEY (id_log_event_type)
+);
+
+
 -- CHAVES ESTRANGEIRAS
 
 
@@ -188,3 +208,8 @@ ALTER TABLE tb_autorizacao_sensor
     ADD CONSTRAINT FK_id_sensor_atuador_tb_sensor_atuador FOREIGN KEY ( id_sensor_atuador ) REFERENCES tb_sensor_atuador ( id_sensor_atuador ),
     ADD CONSTRAINT FK_id_usuario_tb_usuario FOREIGN KEY ( id_usuario ) REFERENCES tb_usuario ( id_usuario ),
     ADD CONSTRAINT FK_id_perfil_autorizacao_tb_perfil_autorizacao FOREIGN KEY ( id_perfil_autorizacao ) REFERENCES tb_perfil_autorizacao ( id_perfil_autorizacao );
+
+-- ************************************** tb_log (FK)
+ALTER TABLE tb_log
+    ADD CONSTRAINT FK_id_usuario_tb_usuario FOREIGN KEY ( id_usuario ) REFERENCES tb_usuario ( id_usuario ),
+    ADD CONSTRAINT FK_id_log_event_type_tb_log_event_type FOREIGN KEY ( id_log_event_type ) REFERENCES tb_log_event_type ( id_log_event_type );
