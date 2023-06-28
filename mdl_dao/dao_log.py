@@ -29,7 +29,7 @@ def registrar_login_usuario_log_bd(id_usuario):
         # Criar uma nova instância do modelo LeituraAtuacao
         log = Log(
             data_hora_log=datetime.datetime.now(),
-            json_log=json.dumps(json_log),
+            json_log=json.dumps(json_log, ensure_ascii=False),
             id_usuario=usuario.id_usuario,
             id_log_event_type=1
         )
