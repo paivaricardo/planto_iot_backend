@@ -26,7 +26,7 @@ def gerar_relatorio_leitura_sensor_servico(uuid_sensor: UUID, begin_date_timesta
 
 
 def obter_relatorio_leituras_sensor_servico(uuid_sensor, begin_date_timestamp, end_date_timestamp,
-                                            filtragem_tipo_sinal):
+                                            filtragem_tipo_sinal, simplificado=False):
     try:
         informacoes_sensor = dao_verificar_sensor_atuador.verificar_existencia_sensor_atuador_base_dados(uuid_sensor)
 
@@ -36,7 +36,7 @@ def obter_relatorio_leituras_sensor_servico(uuid_sensor, begin_date_timestamp, e
                             f"cadastrado no banco de dados.")
 
         leituras_sensor_dicts = dao_listar_ultimas_leituras_sensor_atuador.listar_leituras_sensor_atuador_por_data(
-            uuid_sensor, begin_date_timestamp, end_date_timestamp, filtragem_tipo_sinal)
+            uuid_sensor, begin_date_timestamp, end_date_timestamp, filtragem_tipo_sinal, simplificado=True)
 
         if len(leituras_sensor_dicts) == 0:
             return None

@@ -50,7 +50,7 @@ def listar_ultimas_leituras_sensor_atuador_servico(uuid_sensor_atuador: UUID, nu
 
 
 def listar_leituras_sensor_atuador_por_data(uuid_sensor_atuador: UUID, begin_date_timestamp: datetime.datetime,
-                                            end_date_timestamp: datetime.datetime, filtragem_tipo_sinal: int):
+                                            end_date_timestamp: datetime.datetime, filtragem_tipo_sinal: int, simplificado: bool = False):
     # Criar uma sessão para acesso ao banco de dados
     session = database.create_session()
 
@@ -66,13 +66,19 @@ def listar_leituras_sensor_atuador_por_data(uuid_sensor_atuador: UUID, begin_dat
         # Executar a query
         lista_leituras_result = query.all()
 
-        lista_leituras_result_dicts = [{
-            "id_leitura_atuacao": leitura.id_leitura_atuacao,
-            "data_hora_leitura": leitura.data_hora_leitura,
-            "json_leitura": json.loads(leitura.json_leitura),
-            "id_sensor_atuador": leitura.id_sensor_atuador,
-            "id_tipo_sinal": leitura.id_tipo_sinal,
-        } for leitura in lista_leituras_result]
+        if simplificado:
+            lista_leituras_result_dicts = [{
+                "data_hora_leitura": leitura.data_hora_leitura,
+                "json_leitura": json.loads(leitura.json_leitura),
+            } for leitura in lista_leituras_result]
+        else:
+            lista_leituras_result_dicts = [{
+                "id_leitura_atuacao": leitura.id_leitura_atuacao,
+                "data_hora_leitura": leitura.data_hora_leitura,
+                "json_leitura": json.loads(leitura.json_leitura),
+                "id_sensor_atuador": leitura.id_sensor_atuador,
+                "id_tipo_sinal": leitura.id_tipo_sinal,
+            } for leitura in lista_leituras_result]
 
         return lista_leituras_result_dicts
 
