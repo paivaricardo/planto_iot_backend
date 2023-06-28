@@ -482,7 +482,7 @@ def get_tipos_sensores():
     return tipo_sensor_servicos.obter_tipos_sensores_servico()
 
 @app.get("/gerar-imagem-relatorio-leitura-sensor")
-def gerar_relatorio_leitura_sensores(uuid_sensor: UUID, data_inicial_timestamp: str, data_final_timestamp: str, filtragem_tipo_sinal: Optional[int] = 10000):
+def gerar_imagem_relatorio_leitura_sensor(uuid_sensor: UUID, data_inicial_timestamp: str, data_final_timestamp: str, filtragem_tipo_sinal: Optional[int] = 10000):
     try:
         if filtragem_tipo_sinal is None:
             filtragem_tipo_sinal = 10000
@@ -490,6 +490,9 @@ def gerar_relatorio_leitura_sensores(uuid_sensor: UUID, data_inicial_timestamp: 
         # Parse the begin and end dates
         begin_date_timestamp = datetime.strptime(data_inicial_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
         end_date_timestamp = datetime.strptime(data_final_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
+
+        if end_date_timestamp > datetime.now(tz=timezone.utc):
+            end_date_timestamp = datetime.now(tz=timezone.utc)
 
         if begin_date_timestamp > end_date_timestamp:
             raise Exception("A data-hora inicial deve ser menor ou igual a data-hora final")
@@ -523,6 +526,9 @@ def obter_leituras_relatorio_sensor(uuid_sensor: UUID, data_inicial_timestamp: s
         # Parse the begin and end dates
         begin_date_timestamp = datetime.strptime(data_inicial_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
         end_date_timestamp = datetime.strptime(data_final_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
+
+        if end_date_timestamp > datetime.now(tz=timezone.utc):
+            end_date_timestamp = datetime.now(tz=timezone.utc)
 
         if begin_date_timestamp > end_date_timestamp:
             raise Exception("A data-hora inicial deve ser menor ou igual a data-hora final")
