@@ -14,9 +14,9 @@ def gerar_relatorio_leitura_sensor(informacoes_sensor, leituras_sensor_dicts):
             # Gerar o gráfico usando o matplotlib
             plt.plot(timestamps, values)
             plt.xlabel('Datas')
-            plt.ylabel('Value')
-            plt.title('Sensor Readings')
-            plt.xticks(rotation=45)
+            plt.ylabel('% Umidade')
+            plt.title('Leituras dos sensores - Umidade do solo')
+            plt.xticks(rotation=30)
 
             # Salvar o gráfico em um buffer de memória BytesIO
             image_buffer = BytesIO()
