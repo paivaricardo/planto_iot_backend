@@ -493,8 +493,6 @@ def gerar_imagem_relatorio_leitura_sensor(uuid_sensor: UUID, data_inicial_timest
         begin_date_timestamp = datetime.strptime(data_inicial_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
         end_date_timestamp = datetime.strptime(data_final_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
 
-        end_date_timestamp = end_date_timestamp.replace(hour=23, minute=59, second=59) - timedelta(microseconds=1)
-
         if end_date_timestamp > datetime.now(tz=timezone.utc):
             end_date_timestamp = datetime.now(tz=timezone.utc)
 
@@ -533,8 +531,6 @@ def obter_leituras_relatorio_sensor(uuid_sensor: UUID, data_inicial_timestamp: s
         # Parse the begin and end dates
         begin_date_timestamp = datetime.strptime(data_inicial_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
         end_date_timestamp = datetime.strptime(data_final_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
-
-        end_date_timestamp = end_date_timestamp.replace(hour=23, minute=59, second=59) - timedelta(microseconds=1)
 
         if end_date_timestamp > datetime.now(tz=timezone.utc):
             end_date_timestamp = datetime.now(tz=timezone.utc)
