@@ -11,7 +11,7 @@ from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_
     verificar_cadastrar_usuario_servicos, listar_sensores_atuadores_conectados_servicos, \
     verificar_autorizacao_acesso_sensor_servicos, cultura_servicos, area_servicos, \
     listar_ultimas_leituras_sensor_atuador_servicos, conectar_area_sensor_atuador_servicos, autorizacao_servicos, \
-    tipo_sensor_servicos, log_servicos, relatorio_sensores_atuadores_servicos
+    tipo_sensor_servicos, log_servicos, relatorio_sensores_atuadores_servicos, sensor_servicos
 from model.pydantic_rest_models.area_pydantic_model import AreaPydanticModel
 from model.pydantic_rest_models.autorizacao_pydantic_model import AutorizacaoPydanticModel
 from model.pydantic_rest_models.cultura_pydantic_model import CulturaPydanticModel
@@ -560,3 +560,7 @@ def obter_leituras_relatorio_sensor(uuid_sensor: UUID, data_inicial_timestamp: s
                                 "status": "fail",
                                 "message": f"Erro ao obter as leituras do sensor para relatório.",
                                 "error": str(e)})
+
+@app.get("/sensores")
+def get_sensores():
+    return sensor_servicos.obter_sensores_servico()
