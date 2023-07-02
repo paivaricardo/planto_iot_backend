@@ -1,10 +1,9 @@
 import logging
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from fastapi import FastAPI, HTTPException, Response
-from starlette.responses import FileResponse
+from fastapi import FastAPI, HTTPException
 
 from mdl_servicos import precadastrar_sensor_atuador_servicos, verificar_sensor_atuador_servicos, \
     ativar_atuador_servicos, cadastrar_sensor_atuador_servicos, conectar_usuario_sensor_servicos, \
@@ -17,9 +16,18 @@ from model.pydantic_rest_models.autorizacao_pydantic_model import AutorizacaoPyd
 from model.pydantic_rest_models.cultura_pydantic_model import CulturaPydanticModel
 from model.pydantic_rest_models.sensor_atuador_cadastro_completo_rest_model import SensorAtuadorCadastroCompleto
 from model.pydantic_rest_models.usuario_rest_model import UsuarioRestModel
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+# Configurar o middleware para injeção de cabeçalhos de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health-check")
 def health_check():
