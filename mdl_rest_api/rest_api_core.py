@@ -404,6 +404,9 @@ def put_area(id_cultura: int, cultura: CulturaPydanticModel):
 def get_areas(retrieve_status: Optional[bool] = False):
     return area_servicos.obter_areas_servico(retrieve_status)
 
+@app.get("/areas/{id_area}")
+def get_area(id_area: int):
+    return area_servicos.obter_area_por_id_servico(id_area)
 
 @app.delete("/areas/{id_area}")
 def delete_area(id_area: int):
@@ -579,3 +582,4 @@ def get_sensores():
 @app.get("/usuarios")
 def get_usuarios():
     return usuario_servicos.obter_usuarios_servico()
+

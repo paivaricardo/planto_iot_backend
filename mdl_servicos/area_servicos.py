@@ -16,3 +16,7 @@ def criar_area_servico(area: AreaPydanticModel):
 
 def atualizar_area_servico(id_area: int, area: AreaPydanticModel):
     return dao_area.atualizar_area(id_area, area)
+
+
+def obter_area_por_id_servico(id_area: int):
+    return dao_area.obter_area_por_id_bd(id_area)

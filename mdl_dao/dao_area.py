@@ -110,3 +110,22 @@ def atualizar_area(id_area: int, area: AreaPydanticModel):
 
     finally:
         session.close()
+
+
+def obter_area_por_id_bd(id_area):
+    session = database.create_session()
+
+    try:
+        area = session.query(Area).filter(Area.id_area == id_area).first()
+
+        if area is None:
+            raise Exception(f"[DAO - ERRO] Área não encontrada com o id {id_area}")
+
+        return area
+
+    except SQLAlchemyError as e:
+        logging.error(f"[DAO - ERRO] Erro ao obter todas as áreas: {str(e)}")
+        raise Exception(f"[DAO - ERRO] Erro ao obter todas as áreas: {str(e)}")
+
+    finally:
+        session.close()
