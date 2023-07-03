@@ -406,7 +406,13 @@ def get_areas(retrieve_status: Optional[bool] = False):
 
 @app.get("/areas/{id_area}")
 def get_area(id_area: int):
-    return area_servicos.obter_area_por_id_servico(id_area)
+    try:
+        return area_servicos.obter_area_por_id_servico(id_area)
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "message": f"Erro ao tentar obter a área {id_area} na base de dados",
+                                "error": str(e)})
 
 @app.delete("/areas/{id_area}")
 def delete_area(id_area: int):
