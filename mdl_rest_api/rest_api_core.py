@@ -357,6 +357,16 @@ def listar_ultimas_leituras_sensor_atuador(uuid_sensor_atuador: UUID, num_ultima
 def get_culturas(retrieve_status: Optional[bool] = False):
     return cultura_servicos.obter_culturas_servico(retrieve_status)
 
+@app.get("/culturas/{id_cultura}")
+def get_cultura(id_cultura: int):
+    try:
+        return cultura_servicos.obter_cultura_servico(id_cultura)
+    except Exception as e:
+        raise HTTPException(status_code=400,
+                            detail={
+                                "status": "fail",
+                                "message": f"Erro ao tentar obter a cultura {id_cultura} na base de dados",
+                                "error": str(e)})
 
 @app.delete("/culturas/{id_cultura}")
 def delete_area(id_cultura: int):

@@ -16,3 +16,7 @@ def criar_cultura_servico(cultura: CulturaPydanticModel):
 
 def atualizar_cultura_servico(id_cultura, cultura):
     return dao_cultura.atualizar_cultura(id_cultura, cultura)
+
+
+def obter_cultura_servico(id_cultura):
+    return dao_cultura.obter_cultura_por_id_bd(id_cultura)

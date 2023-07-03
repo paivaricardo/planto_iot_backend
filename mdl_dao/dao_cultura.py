@@ -110,3 +110,22 @@ def atualizar_cultura(id_cultura: int, cultura: CulturaPydanticModel):
 
     finally:
         session.close()
+
+
+def obter_cultura_por_id_bd(id_cultura):
+    session = database.create_session()
+
+    try:
+        area = session.query(Cultura).filter(Cultura.id_cultura == id_cultura).first()
+
+        if area is None:
+            raise Exception(f"[DAO - ERRO] Cultura não encontrada com o id {id_cultura}")
+
+        return area
+
+    except SQLAlchemyError as e:
+        logging.error(f"[DAO - ERRO] Erro ao obter a cultura com o id {id_cultura}: {str(e)}")
+        raise Exception(f"[DAO - ERRO] Erro ao obter a cultura com o id {id_cultura}: {str(e)}")
+
+    finally:
+        session.close()

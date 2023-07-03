@@ -124,8 +124,8 @@ def obter_area_por_id_bd(id_area):
         return area
 
     except SQLAlchemyError as e:
-        logging.error(f"[DAO - ERRO] Erro ao obter todas as áreas: {str(e)}")
-        raise Exception(f"[DAO - ERRO] Erro ao obter todas as áreas: {str(e)}")
+        logging.error(f"[DAO - ERRO] Erro ao obter a área com o id {id_area} {str(e)}")
+        raise Exception(f"[DAO - ERRO] Erro ao obter a área com o id {id_area} {str(e)}")
 
     finally:
         session.close()
