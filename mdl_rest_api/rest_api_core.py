@@ -160,12 +160,20 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
         if not sensor_atuador_status or not sensor_atuador_status["sensor_atuador_existe_bd"]:
             raise Exception("O sensor ou atuador informado não existe na base de dados (não foi precadastrado")
 
+        # Se o cadastro do sensor ou atuador ainda não tiver sido realizado, será criada uma autorização de acesso ao sensor ou atuador
+        if not sensor_atuador_status["sensor_atuador_foi_cadastrado"]:
+            autorizacao_pydantic_model = AutorizacaoPydanticModel(
+                id_sensor_atuador=sensor_atuador_status["sensor_atuador_info"].id_sensor_atuador,
+                email_usuario=sensor_atuador_cadastro_completo.email_usuario_cadastrante,
+                id_perfil_autorizacao=1)
+            autorizacao_created = autorizacao_servicos.criar_autorizacao_servico(autorizacao_pydantic_model)
+
         # Chamar a camada de serviços para verificar se o usuário possui permissão de acesso ao sensor ou atuador
         status_sensor_atuador_autorizacao = verificar_autorizacao_acesso_sensor_servicos.verificar_autorizacao_acesso_sensor_servico(
             sensor_atuador_cadastro_completo.uuid_sensor_atuador,
             sensor_atuador_cadastro_completo.email_usuario_cadastrante)
 
-        # Se o usuário não possuir autorização de acesso ao sensor ou atuador, não será possível possuir no cadastro do sensor ou atuador
+        # Se o usuário não possuir autorização de acesso ao sensor ou atuador, e o cadastro já tiver sido realizado, não será possível editar o cadastro do sensor ou atuador
         if not status_sensor_atuador_autorizacao["usuario_autorizado"]:
             raise Exception("O usuário não possui autorização de acesso ao sensor ou atuador.")
 
@@ -357,6 +365,7 @@ def listar_ultimas_leituras_sensor_atuador(uuid_sensor_atuador: UUID, num_ultima
 def get_culturas(retrieve_status: Optional[bool] = False):
     return cultura_servicos.obter_culturas_servico(retrieve_status)
 
+
 @app.get("/culturas/{id_cultura}")
 def get_cultura(id_cultura: int):
     try:
@@ -367,6 +376,7 @@ def get_cultura(id_cultura: int):
                                 "status": "fail",
                                 "message": f"Erro ao tentar obter a cultura {id_cultura} na base de dados",
                                 "error": str(e)})
+
 
 @app.delete("/culturas/{id_cultura}")
 def delete_area(id_cultura: int):
@@ -414,6 +424,7 @@ def put_area(id_cultura: int, cultura: CulturaPydanticModel):
 def get_areas(retrieve_status: Optional[bool] = False):
     return area_servicos.obter_areas_servico(retrieve_status)
 
+
 @app.get("/areas/{id_area}")
 def get_area(id_area: int):
     try:
@@ -423,6 +434,7 @@ def get_area(id_area: int):
                             detail={
                                 "message": f"Erro ao tentar obter a área {id_area} na base de dados",
                                 "error": str(e)})
+
 
 @app.delete("/areas/{id_area}")
 def delete_area(id_area: int):
@@ -598,4 +610,3 @@ def get_sensores():
 @app.get("/usuarios")
 def get_usuarios():
     return usuario_servicos.obter_usuarios_servico()
-
