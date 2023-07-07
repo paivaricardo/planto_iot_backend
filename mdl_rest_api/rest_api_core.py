@@ -160,24 +160,29 @@ def cadastrar_sensor_atuador(sensor_atuador_cadastro_completo: SensorAtuadorCada
         if not sensor_atuador_status or not sensor_atuador_status["sensor_atuador_existe_bd"]:
             raise Exception("O sensor ou atuador informado não existe na base de dados (não foi precadastrado")
 
-        # Se o cadastro do sensor ou atuador ainda não tiver sido realizado, será criada uma autorização de acesso ao sensor ou atuador
-        if not sensor_atuador_status["sensor_atuador_foi_cadastrado"]:
-            autorizacao_pydantic_model = AutorizacaoPydanticModel(
-                id_sensor_atuador=sensor_atuador_status["sensor_atuador_info"].id_sensor_atuador,
-                email_usuario=sensor_atuador_cadastro_completo.email_usuario_cadastrante,
-                id_perfil_autorizacao=1)
-            autorizacao_created = autorizacao_servicos.criar_autorizacao_servico(autorizacao_pydantic_model)
-
         # Chamar a camada de serviços para verificar se o usuário possui permissão de acesso ao sensor ou atuador
         status_sensor_atuador_autorizacao = verificar_autorizacao_acesso_sensor_servicos.verificar_autorizacao_acesso_sensor_servico(
             sensor_atuador_cadastro_completo.uuid_sensor_atuador,
             sensor_atuador_cadastro_completo.email_usuario_cadastrante)
 
-        # Se o usuário não possuir autorização de acesso ao sensor ou atuador, e o cadastro já tiver sido realizado, não será possível editar o cadastro do sensor ou atuador
-        if not status_sensor_atuador_autorizacao["usuario_autorizado"]:
+        # Se o o cadastro já tiver sido realizado E O usuário não possuir autorização de acesso ao sensor ou atuador, não será possível editar o cadastro do sensor ou atuador
+        if sensor_atuador_status["sensor_atuador_foi_cadastrado"] and not status_sensor_atuador_autorizacao["usuario_autorizado"]:
             raise Exception("O usuário não possui autorização de acesso ao sensor ou atuador.")
+        # Se o cadastro do sensor ou atuador ainda não tiver sido realizado, e o usuário não possui atuorização de acesso, será criada uma autorização de acesso ao sensor ou atuador
+        elif not sensor_atuador_status["sensor_atuador_foi_cadastrado"] and not status_sensor_atuador_autorizacao["usuario_autorizado"]:
+            # Criar uma autorização de acesso ao sensor ou atuador para o usuário cadastrante
+            autorizacao_pydantic_model = AutorizacaoPydanticModel(
+                id_sensor_atuador=sensor_atuador_status["sensor_atuador_info"].id_sensor_atuador,
+                email_usuario=sensor_atuador_cadastro_completo.email_usuario_cadastrante,
+                id_perfil_autorizacao=1)
+            autorizacao_servicos.criar_autorizacao_servico(autorizacao_pydantic_model)
 
-        # Exigir permissão de administrador para cadastrar um sensor ou atuador
+            # Refazer a verificação de autorização de acesso ao sensor ou atuador
+            status_sensor_atuador_autorizacao = verificar_autorizacao_acesso_sensor_servicos.verificar_autorizacao_acesso_sensor_servico(
+                sensor_atuador_cadastro_completo.uuid_sensor_atuador,
+                sensor_atuador_cadastro_completo.email_usuario_cadastrante)
+
+        # Exigir permissão de administrador para cadastrar um sensor ou atuador ou editar um cadastro de sensor ou atuador
         if status_sensor_atuador_autorizacao["perfil_autorizacao"].id_perfil_autorizacao != 1:
             raise Exception(
                 f"O usuário necessita permissão de administrador para cadastrar um sensor ou atuador. A permissão atual do usuário é apenas de {status_sensor_atuador_autorizacao['perfil_autorizacao'].id_perfil_autorizacao}")
